@@ -1,0 +1,1869 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Maths by Ear 2">
+<title>Maths by Ear version 3: Professor Pennyfeather</title>
+<style>
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #000; color: #f4f1e8; font: 1.25rem/1.5 -apple-system, system-ui, sans-serif; }
+header, main, nav { max-width: 46rem; margin: 0 auto; padding: 0 1rem; }
+h1 { font-size: 1.8rem; margin: .8rem 0 .2rem; }
+h2 { font-size: 1.5rem; margin: 1rem 0 .5rem; }
+h3 { font-size: 1.25rem; margin: 1.2rem 0 .4rem; color: #ffd98a; }
+h4 { font-size: 1.15rem; margin: 1rem 0 .3rem; color: #f4f1e8; text-decoration: underline; }
+button, select { font: inherit; color: #000; background: #ffd98a; border: 3px solid #ffd98a; border-radius: .8rem; min-height: 3.6rem; padding: .5rem 1rem; margin: .25rem 0; width: 100%; text-align: left; }
+button:focus, select:focus, input:focus { outline: 4px solid #6cf; outline-offset: 2px; }
+button.big { min-height: 6rem; font-size: 1.8rem; font-weight: bold; text-align: center; }
+button.half { width: calc(50% - .3rem); display: inline-block; vertical-align: top; }
+.row { display: flex; gap: .5rem; flex-wrap: wrap; }
+.row > button { flex: 1 1 45%; }
+nav button { background: #222; color: #f4f1e8; border-color: #555; }
+fieldset { border: 2px solid #555; border-radius: .8rem; margin: .8rem 0; padding: .4rem .8rem .8rem; }
+legend { font-weight: bold; padding: 0 .3rem; }
+label { display: flex; align-items: center; gap: .8rem; min-height: 3.2rem; padding: .2rem 0; }
+input[type=checkbox], input[type=radio] { width: 1.8rem; height: 1.8rem; flex: none; }
+input[type=range] { width: 100%; height: 3rem; }
+ul.plain, ol.plain { list-style: none; padding: 0; margin: 0; }
+ul.arts > li { border-bottom: 1px solid #333; padding: .5rem 0; }
+.meta { color: #c9c3b3; font-size: 1.05rem; }
+#now { color: #c9c3b3; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+#reader p { margin: .6rem 0; }
+a { color: #8cf; }
+#quiz { border: 3px solid #6cf; border-radius: .8rem; padding: .4rem .8rem; margin: .8rem 0; }
+.formula { font-family: ui-monospace, Menlo, monospace; color: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Maths by Ear 3: Professor Pennyfeather's lectures, all in his own words</h1>
+  <p id="now">Loading. One moment, my dear friend, while I find my notes.</p>
+</header>
+<main>
+<section id="v-player" aria-labelledby="h-player">
+  <h2 id="h-player" tabindex="-1">Player: the lecture room</h2>
+  <button id="b-play" class="big" aria-label="Play: the Professor carries on where you left off">Play</button>
+  <button id="b-resume" hidden>Resume where I stopped: I was in the middle of a sentence</button>
+  <section id="quiz" hidden aria-labelledby="h-quiz">
+    <h3 id="h-quiz" tabindex="-1">Examination question, without marks: nobody is keeping score, not even Euclid</h3>
+    <p id="quiz-q"></p>
+    <ul id="quiz-opts" class="plain"></ul>
+    <p class="meta">No need to touch anything: the answer comes by itself after a pause.</p>
+    <button id="b-quizreveal">Tell me the answer now</button>
+    <button id="b-quizskip">Skip the question: I shall not be offended</button>
+  </section>
+  <div class="row">
+    <button id="b-prev">Previous piece: back one lecture or reading</button>
+    <button id="b-next">Next piece: skip ahead</button>
+    <button id="b-pback">Back one paragraph: pray, say that again</button>
+    <button id="b-pfwd">Forward one paragraph: I am rambling</button>
+  </div>
+  <button id="b-again">Say the last formula again: as often as you please</button>
+  <button id="b-what">What's playing? And how far we have come</button>
+  <div class="row">
+    <button id="b-more">More like this: capital, more of that</button>
+    <button id="b-less">Less like this, and skip it: no hard feelings</button>
+  </div>
+  <button id="b-fav" aria-pressed="false">Add this piece to favourites</button>
+  <fieldset id="f-sleep"><legend>Sleep timer: I stop talking after, and tiptoe out</legend></fieldset>
+  <h3 id="h-upnext">Coming up next: on the lecture list</h3>
+  <ol id="upnext" class="plain"></ol>
+</section>
+
+<section id="v-build" aria-labelledby="h-build" hidden>
+  <h2 id="h-build" tabindex="-1">Build a playlist: plan our expedition</h2>
+  <p>Choose a journey and a length, then press Build and play. Categories and levels apply to the random, category and lectures-only modes.</p>
+  <form id="buildform" onsubmit="return false">
+    <fieldset id="f-mode"><legend>Journey</legend></fieldset>
+    <fieldset id="f-thread"><legend>Thread for one-thread mode</legend></fieldset>
+    <fieldset id="f-one"><legend>Category for one-category mode</legend></fieldset>
+    <fieldset id="f-cats"><legend>Categories to include</legend></fieldset>
+    <fieldset id="f-levels"><legend>Levels to include</legend></fieldset>
+    <fieldset id="f-hours"><legend>How long to listen: an hour, or the whole night</legend></fieldset>
+    <fieldset id="f-length"><legend>Length of pieces</legend></fieldset>
+  </form>
+  <p id="buildsummary" class="meta"></p>
+  <button id="b-buildplay" class="big">Build and play: off we go</button>
+  <button id="b-buildonly">Build without playing</button>
+</section>
+
+<section id="v-shelves" aria-labelledby="h-shelves" hidden>
+  <h2 id="h-shelves" tabindex="-1">Shelves: ready-made journeys from my bookcase</h2>
+  <p>Press one and I begin at once.</p>
+  <ul id="shelves" class="plain"></ul>
+</section>
+
+<section id="v-browse" aria-labelledby="h-browse" hidden>
+  <h2 id="h-browse" tabindex="-1">Browse all pieces: the whole catalogue</h2>
+  <p>Grouped by category, then by level, under headings. Each piece has Play and Read buttons, and each of my lectures also has Start the course here, which begins the Grand Course from that lecture.</p>
+  <div id="browse"></div>
+</section>
+
+<section id="v-read" aria-labelledby="h-read" hidden>
+  <h2 id="h-read" tabindex="-1">Piece</h2>
+  <p id="readmeta" class="meta"></p>
+  <div class="row"><button id="b-readplay">Play this piece</button><button id="b-readback">Back</button></div>
+  <div id="reader"></div>
+</section>
+
+<section id="v-sounds" aria-labelledby="h-sounds" hidden>
+  <h2 id="h-sounds" tabindex="-1">Sound gallery: my little orchestra of tones</h2>
+  <p>Every tone I use. All of them are made by your browser as it plays, from simple waves; there are no recorded sound files. Opening tones rise and closing tones fall. Each kind of bracket has its own sound. The deeper a bracket sits inside other brackets, the higher its tone, or, if you choose, the further it moves to the left or right.</p>
+  <h3>The tones</h3>
+  <ul id="sounds" class="plain"></ul>
+  <h3>Nesting, level by level</h3>
+  <ul id="depths" class="plain"></ul>
+  <h3>Examples in your current style</h3>
+  <ul id="soundex" class="plain"></ul>
+</section>
+
+<section id="v-settings" aria-labelledby="h-settings" hidden>
+  <h2 id="h-settings" tabindex="-1">Voice and settings: pace, questions and preferences</h2>
+  <fieldset id="f-pace"><legend>Pace</legend></fieldset>
+  <fieldset id="f-questions"><legend>Questions</legend></fieldset>
+  <fieldset id="f-basics"><legend>Basics: full lectures or refreshers</legend></fieldset>
+  <label for="s-voice" style="display:block">Reading voice</label>
+  <select id="s-voice"></select>
+  <label for="s-rate" style="display:block">Speaking speed</label>
+  <input type="range" id="s-rate" min="0.5" max="1.4" step="0.05">
+  <label for="s-mathrate" style="display:block">Speed inside formulas, compared with the speaking speed</label>
+  <input type="range" id="s-mathrate" min="0.5" max="1" step="0.05">
+  <label for="s-think" style="display:block">Thinking time: how long I wait before giving an answer</label>
+  <input type="range" id="s-think" min="3" max="40" step="1">
+  <button id="b-testvoice">Test the voice with a formula</button>
+  <fieldset id="f-struct"><legend>How brackets are heard</legend></fieldset>
+  <fieldset id="f-depth"><legend>How nesting depth is shown in tones</legend></fieldset>
+  <fieldset id="f-frac"><legend>How fractions are read</legend></fieldset>
+  <label for="s-vol" style="display:block">Tone volume</label>
+  <input type="range" id="s-vol" min="0.1" max="1" step="0.05">
+  <fieldset id="f-toggles"><legend>Teaching extras</legend></fieldset>
+  <fieldset id="f-gap"><legend>Pause between pieces</legend></fieldset>
+  <fieldset id="f-night"><legend>Overnight</legend></fieldset>
+  <button id="b-offline">Save all pieces on this phone for offline listening</button>
+  <button id="b-clearhist">Forget what I have heard, so everything can play again</button>
+  <button id="b-clearquiz">Forget my quiz answers</button>
+  <button id="b-clearweights">Reset more like this and less like this</button>
+  <button id="b-reset">Reset all settings</button>
+</section>
+
+<section id="v-teach" aria-labelledby="h-teach" hidden>
+  <h2 id="h-teach" tabindex="-1">About the Professor, and how he teaches</h2>
+  <div id="teach"></div>
+</section>
+
+<section id="v-help" aria-labelledby="h-help" hidden>
+  <h2 id="h-help" tabindex="-1">How to use: a short guide from the Professor</h2>
+  <div id="help"></div>
+</section>
+
+<section id="v-credits" aria-labelledby="h-credits" hidden>
+  <h2 id="h-credits" tabindex="-1">Credits and licences: giving honour where it is due</h2>
+  <p>The lectures by Professor Pennyfeather were written for Maths by Ear; the Professor is a fictional character. All sounds are synthesised in your browser as they play, so there are no recorded samples and no sound licences to credit. Wikipedia articles are by Wikipedia contributors under the Creative Commons Attribution-ShareAlike 4.0 licence. They have been adapted for listening: references, tables and figures removed, long articles shortened, and every formula rewritten as spoken words, with short plain-words explanations added after displayed formulas. The adapted text is shared under the same licence. Flatland is in the public domain and comes from Project Gutenberg. Each piece below links to its source and licence.</p>
+  <ul id="credits" class="plain arts"></ul>
+</section>
+</main>
+<nav aria-label="Main menu" id="menu">
+  <h2 id="h-menu">Menu</h2>
+  <div class="row">
+    <button id="n-player" data-view="player">Player</button>
+    <button id="n-build" data-view="build">Build a playlist: plan our expedition</button>
+    <button id="n-shelves" data-view="shelves">Shelves</button>
+    <button id="n-browse" data-view="browse">Browse all pieces</button>
+    <button id="n-sounds" data-view="sounds">Sound gallery: hear the tones</button>
+    <button id="n-settings" data-view="settings">Voice and settings</button>
+    <button id="n-teach" data-view="teach">About the Professor, and how he teaches</button>
+    <button id="n-help" data-view="help">How to use: a short guide</button>
+    <button id="n-credits" data-view="credits">Credits and licences: honour where due</button>
+    <button id="b-version">About this version: Maths by Ear version 3</button>
+  </div>
+</nav>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<script>// Maths by Ear: equation to speech. Parses a small LaTeX subset (plus Unicode maths symbols) into a tree,
+// then speaks it in a friendly British ClearSpeak / MathSpeak style, as a list of events:
+//   { say: 'words', math: true }  and  { tone: 'round-open', depth: 0 }
+// Modes: 'words' (structure said in words), 'tones' (bracket words replaced by tones), 'both'.
+// Pure functions, no DOM. Browser: window.MBMath; Node: require.
+(function (root) {
+  'use strict';
+  // ---------- tokens ----------
+  const GREEK = { alpha: 'alpha', beta: 'beta', gamma: 'gamma', delta: 'delta', epsilon: 'epsilon', varepsilon: 'epsilon', zeta: 'zeta', eta: 'eta', theta: 'theta', vartheta: 'theta', iota: 'iota', kappa: 'kappa', lambda: 'lambda', mu: 'mu', nu: 'nu', xi: 'xi', pi: 'pi', varpi: 'pi', rho: 'rho', varrho: 'rho', sigma: 'sigma', varsigma: 'sigma', tau: 'tau', upsilon: 'upsilon', phi: 'phi', varphi: 'phi', chi: 'chi', psi: 'psi', omega: 'omega', Gamma: 'capital gamma', Delta: 'capital delta', Theta: 'capital theta', Lambda: 'capital lambda', Xi: 'capital xi', Pi: 'capital pi', Sigma: 'capital sigma', Phi: 'capital phi', Psi: 'capital psi', Omega: 'capital omega' };
+  const UGREEK = { 'α': 'alpha', 'β': 'beta', 'γ': 'gamma', 'δ': 'delta', 'ε': 'epsilon', 'ϵ': 'epsilon', 'ζ': 'zeta', 'η': 'eta', 'θ': 'theta', 'ϑ': 'theta', 'ι': 'iota', 'κ': 'kappa', 'λ': 'lambda', 'μ': 'mu', 'ν': 'nu', 'ξ': 'xi', 'π': 'pi', 'ρ': 'rho', 'σ': 'sigma', 'ς': 'sigma', 'τ': 'tau', 'υ': 'upsilon', 'φ': 'phi', 'ϕ': 'phi', 'χ': 'chi', 'ψ': 'psi', 'ω': 'omega', 'Γ': 'capital gamma', 'Δ': 'capital delta', 'Θ': 'capital theta', 'Λ': 'capital lambda', 'Ξ': 'capital xi', 'Π': 'capital pi', 'Σ': 'capital sigma', 'Φ': 'capital phi', 'Ψ': 'capital psi', 'Ω': 'capital omega' };
+  const SETS = { R: 'the real numbers', N: 'the natural numbers', Z: 'the integers', Q: 'the rational numbers', C: 'the complex numbers', P: 'the prime numbers' };
+  const USETS = { 'ℝ': 'R', 'ℕ': 'N', 'ℤ': 'Z', 'ℚ': 'Q', 'ℂ': 'C', 'ℙ': 'P' };
+  // operators: spoken words
+  const OPS = {
+    '+': 'plus', '-': 'minus', '−': 'minus', '–': 'minus', '=': 'equals', '×': 'times', times: 'times', cdot: 'times', '·': 'times', '⋅': 'times', '∗': 'times', '*': 'times', ast: 'times',
+    '÷': 'divided by', div: 'divided by', '/': 'divided by', '±': 'plus or minus', pm: 'plus or minus', '∓': 'minus or plus', mp: 'minus or plus',
+    '<': 'is less than', lt: 'is less than', '>': 'is greater than', gt: 'is greater than', '≤': 'is less than or equal to', le: 'is less than or equal to', leq: 'is less than or equal to', leqslant: 'is less than or equal to', '⩽': 'is less than or equal to',
+    '≥': 'is greater than or equal to', ge: 'is greater than or equal to', geq: 'is greater than or equal to', geqslant: 'is greater than or equal to', '⩾': 'is greater than or equal to',
+    '≠': 'is not equal to', ne: 'is not equal to', neq: 'is not equal to', '≈': 'is approximately equal to', approx: 'is approximately equal to', '≃': 'is approximately equal to', simeq: 'is approximately equal to', '∼': 'is similar to', sim: 'is similar to', '≅': 'is congruent to', cong: 'is congruent to',
+    '≡': 'is equivalent to', equiv: 'is equivalent to', '∝': 'is proportional to', propto: 'is proportional to', '≪': 'is much less than', ll: 'is much less than', '≫': 'is much greater than', gg: 'is much greater than',
+    '→': 'tends to', to: 'tends to', rightarrow: 'tends to', '↦': 'maps to', mapsto: 'maps to', '⇒': 'implies', Rightarrow: 'implies', implies: 'implies', '⟹': 'implies', '⇔': 'if and only if', Leftrightarrow: 'if and only if', iff: 'if and only if', '⟺': 'if and only if', '←': 'gets', leftarrow: 'gets', '↔': 'corresponds to', leftrightarrow: 'corresponds to', longrightarrow: 'tends to',
+    '∈': 'is an element of', in: 'is an element of', '∉': 'is not an element of', notin: 'is not an element of', '∋': 'contains', ni: 'contains', '⊂': 'is a subset of', subset: 'is a subset of', '⊆': 'is a subset of, or equal to', subseteq: 'is a subset of, or equal to', '⊃': 'is a superset of', supset: 'is a superset of', '⊇': 'is a superset of, or equal to', supseteq: 'is a superset of, or equal to', '⊊': 'is a proper subset of', subsetneq: 'is a proper subset of',
+    '∪': 'union', cup: 'union', '∩': 'intersection', cap: 'intersection', '∖': 'minus', setminus: 'minus', '∀': 'for all', forall: 'for all', '∃': 'there exists', exists: 'there exists', '∄': 'there does not exist', nexists: 'there does not exist',
+    '¬': 'not', neg: 'not', lnot: 'not', '∧': 'and', land: 'and', wedge: 'and', '∨': 'or', lor: 'or', vee: 'or', '⊕': 'exclusive or', oplus: 'exclusive or', '⊗': 'tensor', otimes: 'tensor', '∘': 'composed with', circ: 'composed with', '∴': 'therefore', therefore: 'therefore', '∵': 'because', because: 'because',
+    '∣': 'divides', mid: 'MID', '∤': 'does not divide', nmid: 'does not divide', '∥': 'is parallel to', parallel: 'is parallel to', '⊥': 'is perpendicular to', perp: 'is perpendicular to', '∠': 'the angle', angle: 'the angle', '△': 'the triangle', triangle: 'the triangle', '≺': 'precedes', '≻': 'succeeds',
+    ',': ',', ';': ';', ':': 'COLON', '.': '.', '%': 'percent', '!': 'factorial', '…': 'and so on', ldots: 'and so on', cdots: 'and so on', dots: 'and so on', '⋯': 'and so on', vdots: 'and so on', '∞': 'infinity', infty: 'infinity', '∅': 'the empty set', emptyset: 'the empty set', varnothing: 'the empty set',
+    '∂': 'partial', partial: 'partial', '∇': 'del', nabla: 'del', '°': 'degrees', circledegrees: 'degrees', '′': 'prime', prime: 'prime', '″': 'double prime', ell: 'l', hbar: 'h bar', '⋮': 'and so on', '?': '?', '&': '', '\\': ',', '#': 'number', 'ℏ': 'h bar', '′′': 'double prime', '‴': 'triple prime', '^': '', '~': ''
+  };
+  const BIGOPS = { sum: 'sum', '∑': 'sum', prod: 'product', '∏': 'product', int: 'integral', '∫': 'integral', iint: 'double integral', '∬': 'double integral', iiint: 'triple integral', oint: 'contour integral', '∮': 'contour integral', lim: 'limit', bigcup: 'union', '⋃': 'union', bigcap: 'intersection', '⋂': 'intersection', limsup: 'limit superior', liminf: 'limit inferior', max: 'maximum', min: 'minimum', sup: 'supremum', inf: 'infimum' };
+  const FUNCS = { sin: 'sine', cos: 'cosine', tan: 'tangent', sec: 'secant', csc: 'cosecant', cosec: 'cosecant', cot: 'cotangent', arcsin: 'arc sine', arccos: 'arc cosine', arctan: 'arc tangent', sinh: 'hyperbolic sine', cosh: 'hyperbolic cosine', tanh: 'hyperbolic tangent', log: 'log', ln: 'natural log', lg: 'log', exp: 'exponential', det: 'determinant', gcd: 'highest common factor', lcm: 'lowest common multiple', deg: 'degree', dim: 'dimension', ker: 'kernel', arg: 'argument', Pr: 'probability', mod: 'mod', bmod: 'mod', pmod: 'mod', sgn: 'sign', Re: 'real part', Im: 'imaginary part', var: 'variance', Var: 'variance', cov: 'covariance', Cov: 'covariance', E: 'expected value' };
+  const OPEN = { '(': 'round', '[': 'square', '{': 'curly', '⟨': 'angle', langle: 'angle', lbrace: 'curly', lbrack: 'square', lceil: 'ceiling', lfloor: 'floor', '⌈': 'ceiling', '⌊': 'floor', '⟦': 'square' };
+  const CLOSE = { ')': 'round', ']': 'square', '}': 'curly', '⟩': 'angle', rangle: 'angle', rbrace: 'curly', rbrack: 'square', rceil: 'ceiling', rfloor: 'floor', '⌉': 'ceiling', '⌋': 'floor', '⟧': 'square' };
+  const ACCENTS = { bar: 'bar', overline: 'bar', hat: 'hat', widehat: 'hat', tilde: 'tilde', widetilde: 'tilde', vec: 'vector', dot: 'dot', ddot: 'double dot', underline: 'underline', overrightarrow: 'vector', check: 'check' };
+  const IGNORE = new Set(['left', 'right', 'big', 'Big', 'bigg', 'Bigg', 'bigl', 'bigr', 'Bigl', 'Bigr', 'biggl', 'biggr', 'displaystyle', 'textstyle', 'scriptstyle', 'limits', 'nolimits', 'quad', 'qquad', ',', ';', '!', ':', ' ', 'middle', 'mathstrut', 'strut', 'phantom', 'hphantom', 'vphantom', 'nonumber', 'notag', 'tag']);
+  const STYLE = new Set(['mathrm', 'mathbf', 'mathit', 'mathsf', 'mathtt', 'boldsymbol', 'bm', 'mathcal', 'mathscr', 'mathfrak', 'textbf', 'textit', 'rm', 'bf', 'it', 'mbox', 'hbox']);
+
+  function tokenize(s) {
+    const t = []; let i = 0;
+    while (i < s.length) {
+      const c = s[i];
+      if (c === '\\') {
+        const m = s.slice(i + 1).match(/^[A-Za-z]+/);
+        if (m) { t.push({ k: 'cmd', v: m[0] }); i += 1 + m[0].length; continue; }
+        const n = s[i + 1] || ''; i += 2;
+        if (n === '{') t.push({ k: 'ch', v: '{' }); else if (n === '}') t.push({ k: 'ch', v: '}' }); else if (n === '|') t.push({ k: 'ch', v: '‖' }); else if (n === '%') t.push({ k: 'ch', v: '%' }); else if (n === '\\') t.push({ k: 'ch', v: '\\' }); else if (n === '#' || n === '$' || n === '&' || n === '_') t.push({ k: 'ch', v: n === '_' ? ' ' : n });
+        continue;
+      }
+      if (c === '{') { t.push({ k: 'lb' }); i++; continue; }
+      if (c === '}') { t.push({ k: 'rb' }); i++; continue; }
+      if (c === '^') { t.push({ k: 'sup' }); i++; continue; }
+      if (c === '_') { t.push({ k: 'sub' }); i++; continue; }
+      if (/\s/.test(c) || c === '\u2061' || c === '\u2062' || c === '\u2063' || c === '\u2064' || c === '\u200b' || c === '\u2060' || c === '\u00a0' || c === '~') { i++; continue; }
+      if (/[0-9]/.test(c)) { const m = s.slice(i).match(/^[0-9]+(?:\.[0-9]+)?/); t.push({ k: 'num', v: m[0] }); i += m[0].length; continue; }
+      if (c === '.' && /[0-9]/.test(s[i + 1] || '')) { const m = s.slice(i).match(/^\.[0-9]+/); t.push({ k: 'num', v: '0' + m[0] }); i += m[0].length; continue; }
+      const cp = s.codePointAt(i), ch = String.fromCodePoint(cp);
+      if (/^[A-Za-z]$/.test(ch)) { t.push({ k: 'let', v: ch }); i++; continue; }
+      if (ch === '′' || ch === "'") { t.push({ k: 'prime' }); i += ch.length; continue; }
+      if (/[²³¹⁰⁴-⁹]/.test(ch)) { const map = { '²': '2', '³': '3', '¹': '1', '⁰': '0', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9' }; t.push({ k: 'sup' }); t.push({ k: 'num', v: map[ch] }); i += ch.length; continue; }
+      t.push({ k: 'ch', v: ch }); i += ch.length;
+    }
+    return t;
+  }
+
+  // ---------- parser ----------
+  function parse(src) {
+    const T = tokenize(String(src).replace(/\\(text|textrm|textup|textnormal)\{([^{}]*)\}/g, (m, c, a) => '\\' + c + '{' + a.trim().replace(/\s+/g, '\u2423') + '}')); let p = 0;
+    const peek = () => T[p], next = () => T[p++];
+    const isOpen = tk => tk && ((tk.k === 'ch' && OPEN[tk.v] && tk.v !== '}') || (tk.k === 'cmd' && OPEN[tk.v]));
+    const isClose = tk => tk && ((tk.k === 'ch' && CLOSE[tk.v] && tk.v !== '{') || (tk.k === 'cmd' && CLOSE[tk.v]));
+    // read one LaTeX argument: {group} or a single token's atom
+    function arg() {
+      const tk = peek(); if (!tk) return { t: 'row', body: [] };
+      if (tk.k === 'lb') { next(); const body = seq(x => x.k === 'rb'); if (peek() && peek().k === 'rb') next(); return { t: 'row', body }; }
+      return atom() || { t: 'row', body: [] };
+    }
+    function textArg() { // raw text inside \text{...}
+      if (!peek() || peek().k !== 'lb') return '';
+      next(); let depth = 1, out = '';
+      while (p < T.length) { const tk = next(); if (tk.k === 'lb') depth++; else if (tk.k === 'rb') { if (--depth === 0) break; } out += tk.k === 'ch' && tk.v === '\u2423' ? ' ' : tk.k === 'num' || tk.k === 'let' || tk.k === 'ch' ? tk.v : tk.k === 'cmd' ? (tk.v in OPS ? ' ' + OPS[tk.v] + ' ' : ' ') : ' '; }
+      return out;
+    }
+    function rawArg() { // tokens of an environment name
+      if (!peek() || peek().k !== 'lb') return ''; next(); let out = '';
+      while (p < T.length && peek().k !== 'rb') { const tk = next(); out += tk.v || ''; } next(); return out;
+    }
+    function atom() {
+      const tk = peek(); if (!tk) return null;
+      if (tk.k === 'num') { next(); return { t: 'num', v: tk.v }; }
+      if (tk.k === 'let') { next(); return { t: 'var', v: tk.v }; }
+      if (tk.k === 'lb') return arg();
+      if (tk.k === 'prime') { next(); return { t: 'op', v: 'prime' }; }
+      if (isOpen(tk)) {
+        next(); const kind = tk.k === 'cmd' ? OPEN[tk.v] : OPEN[tk.v];
+        const body = seq(x => isClose(x) || (x.k === 'cmd' && x.v === 'right' && isClose(T[p + 1])));
+        if (peek() && peek().k === 'cmd' && peek().v === 'right') next();
+        let close = null; if (isClose(peek())) { const c = next(); close = CLOSE[c.v]; }
+        return { t: 'group', open: kind, close, body };
+      }
+      if (tk.k === 'ch' && (tk.v === '|' || tk.v === '‖')) {
+        const bar = tk.v; next();
+        const save = p; const body = seq(x => x.k === 'ch' && x.v === bar);
+        if (peek() && peek().k === 'ch' && peek().v === bar && body.length) { next(); return { t: bar === '|' ? 'abs' : 'norm', body }; }
+        p = save; return { t: 'op', v: bar === '|' ? 'BAR' : 'is parallel to' };
+      }
+      if (tk.k === 'ch') {
+        next();
+        if (UGREEK[tk.v]) return { t: 'var', v: UGREEK[tk.v], greek: true };
+        if (USETS[tk.v]) return { t: 'set', v: USETS[tk.v] };
+        if (BIGOPS[tk.v]) return big(BIGOPS[tk.v]);
+        if (tk.v === '√' || tk.v === '∛' || tk.v === '∜') { const b = atom(); return { t: 'sqrt', index: tk.v === '√' ? null : { t: 'num', v: tk.v === '∛' ? '3' : '4' }, body: b || { t: 'row', body: [] } }; }
+        if (tk.v in OPS) return { t: 'op', v: OPS[tk.v] };
+        if (CLOSE[tk.v]) return { t: 'stray', kind: CLOSE[tk.v] };
+        return { t: 'sym', v: tk.v };
+      }
+      if (tk.k === 'cmd') {
+        next(); const c = tk.v;
+        if (IGNORE.has(c)) return { t: 'row', body: [] };
+        if (c === 'frac' || c === 'dfrac' || c === 'tfrac' || c === 'cfrac') { const a = arg(), b = arg(); return { t: 'frac', num: a, den: b }; }
+        if (c === 'over') return { t: 'op', v: 'over' };
+        if (c === 'binom' || c === 'dbinom' || c === 'tbinom' || c === 'choose') { if (c === 'choose') return { t: 'op', v: 'choose' }; const a = arg(), b = arg(); return { t: 'binom', n: a, k: b }; }
+        if (c === 'sqrt') {
+          let index = null;
+          if (peek() && peek().k === 'ch' && peek().v === '[') { next(); const b = seq(x => x.k === 'ch' && x.v === ']'); next(); index = { t: 'row', body: b }; }
+          return { t: 'sqrt', index, body: arg() };
+        }
+        if (c === 'text' || c === 'textrm' || c === 'mathrm' && false || c === 'textup' || c === 'textnormal' || c === 'operatorname' || c === 'textsf' || c === 'texttt') { const s = textArg().trim(); return c === 'operatorname' ? funcNode(s) : { t: 'text', v: s }; }
+        if (c === 'mathbb' || c === 'Bbb' || c === 'mathbf' && peek() && false) { const a = rawArg(); return SETS[a] ? { t: 'set', v: a } : { t: 'var', v: a }; }
+        if (STYLE.has(c)) { const a = arg(); if (a.t === 'row' && a.body.length > 1 && a.body.every(n => n.t === 'var' && !n.greek)) { const w = a.body.map(n => n.v).join(''); if (FUNCS[w] || BIGOPS[w]) return funcNode(w); return { t: 'text', v: w }; } return a; }
+        if (ACCENTS[c]) return { t: 'accent', kind: ACCENTS[c], body: arg() };
+        if (c === 'underbrace' || c === 'overbrace') { const a = arg(); if (peek() && (peek().k === 'sub' || peek().k === 'sup')) { next(); arg(); } return a; }
+        if (c === 'begin') { const env = rawArg(); let depth = 1; while (p < T.length) { const x = next(); if (x.k === 'cmd' && x.v === 'begin') depth++; if (x.k === 'cmd' && x.v === 'end') { depth--; if (depth === 0) { rawArg(); break; } } } return { t: 'table', env }; }
+        if (c === 'end') { rawArg(); return { t: 'row', body: [] }; }
+        if (GREEK[c]) return { t: 'var', v: GREEK[c], greek: true };
+        if (BIGOPS[c]) return big(BIGOPS[c]);
+        if (FUNCS[c]) return funcNode(c);
+        if (c === 'pmod') { const a = arg(); return { t: 'row', body: [{ t: 'op', v: 'mod' }, a] }; }
+        if (c in OPS) return { t: 'op', v: OPS[c] };
+        if (OPEN[c] || CLOSE[c]) return { t: 'stray', kind: OPEN[c] || CLOSE[c] };
+        if (c === 'not') { const n = atom(); return { t: 'row', body: [{ t: 'op', v: 'not' }, n || { t: 'row', body: [] }] }; }
+        if (c === 'color' || c === 'textcolor') { rawArg(); return { t: 'row', body: [] }; }
+        if (c === 'tone') { const a = rawArg(); return { t: 'tonedemo', v: a }; }
+        return { t: 'text', v: c };
+      }
+      next(); return null;
+    }
+    function funcNode(name) { if (BIGOPS[name]) return big(BIGOPS[name]); return { t: 'fn', name: FUNCS[name] || name }; }
+    function big(name) {
+      const n = { t: 'big', name, lower: null, upper: null };
+      for (let k = 0; k < 2; k++) {
+        const tk = peek();
+        if (tk && tk.k === 'sub') { next(); n.lower = arg(); }
+        else if (tk && tk.k === 'sup') { next(); n.upper = arg(); }
+        else if (tk && tk.k === 'cmd' && (tk.v === 'limits' || tk.v === 'nolimits')) { next(); k--; }
+      }
+      return n;
+    }
+    function postfix(a) {
+      for (;;) {
+        const tk = peek(); if (!tk) return a;
+        if (tk.k === 'sup') { next(); const e = arg(); const ef = flat(e); const pn = ef.length && ef.every(x => x.t === 'op' && /prime$/.test(x.v)) ? ef.reduce((n, x) => n + (x.v === 'prime' ? 1 : x.v === 'double prime' ? 2 : 3), 0) : 0; if (pn && a.t !== 'sub') { a = { t: 'prime', base: a, n: pn }; continue; } if (a.t === 'sub') a = { t: 'subsup', base: a.base, sub: a.sub, exp: e }; else a = { t: 'sup', base: a, exp: e }; continue; }
+        if (tk.k === 'sub') { next(); const s = arg(); if (a.t === 'sup') a = { t: 'subsup', base: a.base, sub: s, exp: a.exp }; else a = { t: 'sub', base: a, sub: s }; continue; }
+        if (tk.k === 'prime') { next(); a = { t: 'prime', base: a, n: (a.t === 'prime' ? a.n + 1 : 1) }; if (a.base.t === 'prime') { a = { t: 'prime', base: a.base.base, n: a.base.n + 1 }; } continue; }
+        if (tk.k === 'ch' && tk.v === '!' && a.t !== 'op') { next(); a = { t: 'fact', base: a }; continue; }
+        return a;
+      }
+    }
+    function seq(stop) {
+      const out = [];
+      while (p < T.length) {
+        const tk = peek();
+        if (stop && stop(tk)) break;
+        if (tk.k === 'rb') { if (stop) break; next(); continue; }
+        if (!stop && isClose(tk)) { next(); out.push(postfix({ t: 'stray', kind: CLOSE[tk.v] })); continue; }
+        if (stop && isClose(tk)) break;
+        const a = atom(); if (a) out.push(postfix(a));
+      }
+      return out;
+    }
+    const body = seq(null);
+    return { t: 'row', body };
+  }
+
+  // ---------- helpers ----------
+  const flat = n => (n && n.t === 'row') ? n.body.flatMap(flat) : (n ? [n] : []);
+  function isSimple(n) { const f = flat(n); if (f.length !== 1) return false; const x = f[0]; return x.t === 'num' || x.t === 'var' || x.t === 'set' || (x.t === 'sub' && isSimple(x.base) && isSimple(x.sub)) || (x.t === 'text' && x.v.split(/\s+/).length <= 2); }
+  function isNegNum(n) { const f = flat(n); return f.length === 2 && f[0].t === 'op' && f[0].v === 'minus' && f[1].t === 'num'; }
+  const ORD = { 2: ['half', 'halves'], 3: ['third', 'thirds'], 4: ['quarter', 'quarters'], 5: ['fifth', 'fifths'], 6: ['sixth', 'sixths'], 7: ['seventh', 'sevenths'], 8: ['eighth', 'eighths'], 9: ['ninth', 'ninths'], 10: ['tenth', 'tenths'] };
+  function ordinalFrac(n) { const a = flat(n.num), b = flat(n.den); if (a.length !== 1 || b.length !== 1 || a[0].t !== 'num' || b[0].t !== 'num') return null; const x = +a[0].v, y = +b[0].v; if (!Number.isInteger(x) || !ORD[y] || x < 1 || x >= 20 || /\./.test(a[0].v + b[0].v)) return null; return (x === 1 ? 'one ' + ORD[y][0] : x + ' ' + ORD[y][1]); }
+  const ORDW = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+  const BRWORD = { round: 'bracket', square: 'square bracket', curly: 'curly brace', angle: 'angle bracket', ceiling: 'ceiling bracket', floor: 'floor bracket' };
+  const LEVELW = ['', '', 'level two', 'level three', 'level four', 'level five', 'level six'];
+  // lowercase a: the speech engine says 'eigh' (rhymes with 'weigh') so it is never heard as the article 'uh' nor shown as a capital; screen text keeps 'a'
+  let SCREEN = false;
+  function letterWord(v) { return v === 'a' ? (SCREEN ? 'a' : 'eigh') : v; }
+  function isDiff(n) { const f = flat(n); return f.length >= 1 && f[0].t === 'var' && (f[0].v === 'd' || f[0].v === 'partial') || (f.length >= 1 && f[0].t === 'op' && f[0].v === 'partial') || (f[0] && f[0].t === 'sup' && flat(f[0].base)[0] && (flat(f[0].base)[0].v === 'd' || flat(f[0].base)[0].v === 'partial')); }
+
+  // ---------- speech ----------
+  // opts: { mode: 'brackets'|'words'|'tones'|'both', structTones: true, fracStyle: 'full'|'short' }
+  // 'brackets' (v3 default): brackets are tones only and never said; everything else is said in words
+  function speakTree(tree, opts) {
+    const o = Object.assign({ mode: 'brackets', structTones: true, fracStyle: 'full' }, opts);
+    const words = o.mode !== 'tones', tones = o.mode !== 'words', st = tones && o.structTones, brWords = o.mode === 'words' || o.mode === 'both';
+    const ev = []; let depth = 0, inCurly = 0, inGroup = 0;
+    const say = s => { if (s == null || s === '') return; ev.push({ say: String(s) }); };
+    const tone = (k, d) => ev.push({ tone: k, depth: d || 0 });
+    function brOpen(kind) {
+      const d = depth, w = 'open ' + (BRWORD[kind] || 'bracket') + (d >= 1 ? ', ' + (LEVELW[d + 1] || 'level ' + (d + 1)) : '');
+      if (tones) tone((kind === 'square' || kind === 'curly' ? kind : 'round') + '-open', d);
+      if (brWords) { say(w); say(','); }
+    }
+    function brClose(kind, d) {
+      const w = 'close ' + (BRWORD[kind] || 'bracket') + (d >= 1 ? ', ' + (LEVELW[d + 1] || 'level ' + (d + 1)) : '');
+      if (brWords) { say(','); say(w); say(','); }
+      if (tones) tone((kind === 'square' || kind === 'curly' ? kind : 'round') + '-close', d);
+    }
+    function node(n, next, prev) {
+      if (!n) return;
+      switch (n.t) {
+        case 'row': return list(n.body);
+        case 'num': return say(n.v);
+        case 'var': return say(n.greek ? n.v : (/^[A-Z]$/.test(n.v) && !n.plainCap ? 'capital ' + n.v : letterWord(n.v)));
+        case 'set': return say(SETS[n.v] || n.v);
+        case 'text': return say(n.v);
+        case 'sym': return say(n.v);
+        case 'tonedemo': return tone(n.v, 0); // demonstrations always play, whatever the mode
+        case 'op': {
+          let v = n.v;
+          if (v === 'MID') v = inCurly ? 'such that' : 'given';
+          if (v === 'BAR') v = inCurly ? 'such that' : 'vertical bar';
+          if (v === 'COLON') v = inCurly ? 'such that' : 'to';
+          if (v === ',' && inGroup > 0) { say('comma'); return; } // (3, 2): the comma is said
+          if (v === ',' || v === ';' || v === '.' || v === ':') { if (ev.length && ev[ev.length - 1].say) ev[ev.length - 1].say += v; else say(v); return; }
+          if (v === 'over') return say('over');
+          return say(v);
+        }
+        case 'stray': return brWords ? say('close ' + (BRWORD[n.kind] || 'bracket')) : tone((n.kind === 'square' || n.kind === 'curly' ? n.kind : 'round') + '-close', 0);
+        case 'group': {
+          const d = depth;
+          if (n.open === 'curly') inCurly++;
+          brOpen(n.open); depth++; inGroup++; list(n.body); inGroup--; depth--;
+          if (n.close) brClose(n.close, d);
+          if (n.open === 'curly') inCurly--;
+          return;
+        }
+        case 'abs': { say('the absolute value of'); if (!isSimple({ t: 'row', body: n.body })) { list(n.body); say(','); say('end absolute value,'); } else list(n.body); return; }
+        case 'norm': { say('the norm of'); list(n.body); say('end norm'); return; }
+        case 'frac': {
+          const ord = ordinalFrac(n); if (ord) return say(ord);
+          if (isDiff(n.num) && isDiff(n.den)) { node(n.num); say('by'); node(n.den); if (flat(n.num).length === 1 && next) say('of'); return; } // d y by d x; d by d x of ...
+          const simple = isSimple(n.num) && isSimple(n.den);
+          if (st) tone('frac-start', depth);
+          if (simple) { node(n.num); say('over'); node(n.den); if (st) tone('frac-end', depth); else if (words) ev.push({ say: ',' }); return; }
+          if (words) say(o.fracStyle === 'short' ? 'the fraction' : 'the fraction, numerator,');
+          node(n.num); say(',');
+          say(o.fracStyle === 'short' || !words ? 'over' : 'over, denominator,');
+          node(n.den); say(',');
+          if (words) say('end fraction,');
+          if (st) tone('frac-end', depth);
+          return;
+        }
+        case 'binom': node(n.n); say('choose'); node(n.k); return;
+        case 'sup': {
+          const b = n.base, e = flat(n.exp);
+          if (b.t === 'fn') { say(b.name); powerWords(n.exp); say('of'); return; }
+          if (b.t === 'big') { node(b); return; }
+          if (e.length === 1 && e[0].t === 'op' && (e[0].v === 'composed with' || e[0].v === 'degrees')) { node(b); return say('degrees'); }
+          if (b.t === 'var' && /^[fgh]$/.test(b.v) && e.length === 2 && e[0].t === 'op' && e[0].v === 'minus' && e[1].t === 'num' && e[1].v === '1') { say(b.v + ' inverse'); return; }
+          node(b);
+          return powerWords(n.exp);
+        }
+        case 'sub': {
+          const b = n.base;
+          if (b.t === 'fn' && b.name === 'log') { say('log base'); node(n.sub); say('of'); return; }
+          if (b.t === 'big') return node(b);
+          node(b); say('sub'); node(n.sub); return;
+        }
+        case 'subsup': { node({ t: 'sub', base: n.base, sub: n.sub }); return powerWords(n.exp); }
+        case 'prime': { node(n.base); say(n.n === 1 ? 'prime' : n.n === 2 ? 'double prime' : n.n === 3 ? 'triple prime' : n.n + ' primes'); return; }
+        case 'fact': { node(n.base); say('factorial'); return; }
+        case 'sqrt': {
+          const idx = n.index && flat(n.index), simple = isSimple(n.body);
+          const nm = !idx ? 'the square root of' : (idx.length === 1 && idx[0].v === '3') ? 'the cube root of' : null;
+          if (st) tone('root-start', depth);
+          if (nm) say(nm); else { say('the'); node(n.index); say('th root of'); }
+          node(n.body);
+          if (!simple && words) { say(','); say('end root,'); }
+          if (st) tone('root-end', depth);
+          return;
+        }
+        case 'fn': { say(n.name === 'mod' ? 'mod' : n.name); if (n.name !== 'mod') say('of'); return; }
+        case 'big': {
+          const nm = n.name;
+          if (nm === 'limit' || nm === 'limit superior' || nm === 'limit inferior' || /^(maximum|minimum|supremum|infimum)$/.test(nm)) { say('the ' + nm); if (n.lower) { say(nm === 'limit' ? 'as' : 'over'); node(n.lower); } say('of'); return; }
+          say('the ' + nm);
+          if (n.lower && n.upper) { say('from'); node(n.lower); say('to'); node(n.upper); }
+          else if (n.lower) { say('over'); node(n.lower); }
+          else if (n.upper) { say('up to'); node(n.upper); }
+          say('of'); return;
+        }
+        case 'accent': { node(n.body); say(n.kind === 'vector' ? 'vector' : n.kind); return; }
+        case 'table': return say(n.env === 'cases' ? 'a definition in separate cases, explained in the text' : 'a table of values, not read aloud');
+        default: return;
+      }
+    }
+    function powerWords(exp) {
+      const e = flat(exp);
+      if (e.length === 1 && e[0].t === 'num' && e[0].v === '2') return say('squared');
+      if (e.length === 1 && e[0].t === 'num' && e[0].v === '3') return say('cubed');
+      if (e.length === 1 && e[0].t === 'op' && e[0].v === 'degrees') return say('degrees');
+      if (e.length === 1 && e[0].t === 'op' && e[0].v === 'prime') return say('prime');
+      if (e.length === 1 && (e[0].t === 'op') && /^(times|plus|minus)$/.test(e[0].v)) return say(e[0].v === 'times' ? 'star' : e[0].v);
+      if (isSimple(exp) || isNegNum(exp)) { if (st) tone('power-start', depth); say('to the power of'); node(exp); if (st) tone('power-end', depth); else if (words) ev.push({ say: ',' }); return; }
+      if (st) tone('power-start', depth);
+      say(words ? 'raised to the power of,' : 'to the power of');
+      node(exp);
+      if (words) { say(','); say('end power,'); }
+      if (st) tone('power-end', depth);
+    }
+    function list(arr) {
+      // runs of capital letters such as ABC (a triangle's corners) are said as plain letters
+      arr.forEach((n, i) => { const up = x => x && x.t === 'var' && !x.greek && /^[A-Z]$/.test(x.v); if (up(n) && (up(arr[i - 1]) || up(arr[i + 1]))) n.plainCap = true; });
+      for (let i = 0; i < arr.length; i++) {
+        const n = arr[i], nx = arr[i + 1];
+        // f(x): function letter followed by a simple bracket, read "f of x"
+        if (n.t === 'sup' && n.base.t === 'var' && /^[fgh]$/.test(n.base.v) && flat(n.exp).length === 2 && flat(n.exp)[1].v === '1' && nx && nx.t === 'group' && nx.open === 'round' && nx.body.length <= 3 && !nx.body.some(b => b.t === 'op' && b.v !== ',')) { say(n.base.v + ' inverse of'); list(nx.body); i++; continue; }
+        if (n.t === 'var' && /^[fghFG]$/.test(n.v) && nx && nx.t === 'group' && nx.open === 'round' && nx.close === 'round' && nx.body.length && nx.body.some(b => b.t === 'op' || b.t === 'frac' || b.t === 'big')) { say(letterWord(n.v) + ' of'); node(nx); i++; continue; }
+        if (n.t === 'var' && /^[fghFGHPpuvyq]$/.test(n.v) && nx && nx.t === 'group' && nx.open === 'round' && nx.close === 'round' && nx.body.length && (nx.body.every(b => isSimple(b) || (b.t === 'op' && b.v === ',')) || (nx.body.length <= 3 && !nx.body.some(b => b.t === 'op' || b.t === 'frac' || b.t === 'big')))) { say(letterWord(n.v) + ' of'); list(nx.body); i++; continue; }
+        if (n.t === 'prime' && flat(n.base).length === 1 && flat(n.base)[0].t === 'var' && nx && nx.t === 'group' && nx.open === 'round' && nx.body.every(b => isSimple(b))) { node(n); say('of'); list(nx.body); i++; continue; }
+        // mixed number: 2 and a half
+        if (n.t === 'num' && nx && nx.t === 'frac' && ordinalFrac(nx)) { say(n.v + ' and ' + ordinalFrac(nx)); i++; continue; }
+        node(n, nx, arr[i - 1]);
+      }
+    }
+    node(tree);
+    // merge neighbouring words into one event
+    const out = [];
+    for (const e of ev) {
+      if (e.say != null) {
+        const s = e.say.trim(); if (!s) continue;
+        const last = out[out.length - 1];
+        if (last && last.say != null) last.say = (/^[,.;:]$/.test(s) ? last.say + s : last.say + ' ' + s);
+        else out.push({ say: s, math: true });
+      } else out.push(e);
+    }
+    out.forEach(e => { if (e.say) e.say = e.say.replace(/\s+,/g, ',').replace(/,+/g, ',').replace(/,\s*$/, ''); });
+    return out.filter(e => e.tone || (e.say && e.say.replace(/[,.;:\s]/g, '')));
+  }
+  function speak(latex, opts) { return speakTree(parse(latex), opts); }
+  function speakText(latex, opts) { SCREEN = true; try { return speak(latex, Object.assign({}, opts, { mode: 'words' })).map(e => e.say).join(' ').replace(/\s+,/g, ','); } finally { SCREEN = false; } }
+
+  // ---------- written linear form (for reading on screen) ----------
+  const SUPS = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', n: 'ⁿ', '-': '⁻', '+': '⁺', i: 'ⁱ' };
+  const OPCH = { plus: '+', minus: '−', equals: '=', times: '×', 'divided by': '÷', 'plus or minus': '±', 'is less than': '<', 'is greater than': '>', 'is less than or equal to': '≤', 'is greater than or equal to': '≥', 'is not equal to': '≠', 'is approximately equal to': '≈', 'tends to': '→', 'implies': '⇒', 'if and only if': '⇔', 'is an element of': '∈', 'is not an element of': '∉', 'is a subset of': '⊂', 'union': '∪', 'intersection': '∩', 'for all': '∀', 'there exists': '∃', 'infinity': '∞', 'the empty set': '∅', 'factorial': '!', 'percent': '%', 'and so on': '…', 'degrees': '°', 'is equivalent to': '≡', 'is proportional to': '∝', 'not': '¬', 'and': '∧', 'or': '∨', 'maps to': '↦', 'partial': '∂', 'composed with': '∘', 'prime': '′', MID: '|', BAR: '|', COLON: ':', 'divides': '|', over: '/' };
+  const GRK = {}; Object.entries(UGREEK).forEach(([k, v]) => { if (!GRK[v]) GRK[v] = k; });
+  const BRCH = { round: ['(', ')'], square: ['[', ']'], curly: ['{', '}'], angle: ['⟨', '⟩'], ceiling: ['⌈', '⌉'], floor: ['⌊', '⌋'] };
+  function written(n) {
+    const w = written, L = a => a.map(w).join(''), sp = s => ' ' + s + ' ';
+    if (!n) return '';
+    switch (n.t) {
+      case 'row': { let s = ''; n.body.forEach((x, i) => { const t = w(x); s += (x.t === 'frac' && i && n.body[i - 1].t === 'num' ? ' ' : '') + t; }); return s; }
+      case 'num': return n.v;
+      case 'var': return n.greek ? (GRK[n.v] || n.v) : n.v;
+      case 'set': return ({ R: 'ℝ', N: 'ℕ', Z: 'ℤ', Q: 'ℚ', C: 'ℂ', P: 'ℙ' })[n.v] || n.v;
+      case 'text': return ' ' + n.v + ' ';
+      case 'sym': return n.v;
+      case 'tonedemo': return '';
+      case 'op': { const c = OPCH[n.v]; if (n.v === ',' || n.v === ';' || n.v === '.') return n.v + ' '; if (n.v === 'factorial' || n.v === 'prime' || n.v === 'percent' || n.v === 'degrees') return c; return c ? sp(c) : sp(n.v); }
+      case 'stray': return BRCH[n.kind] ? BRCH[n.kind][1] : ')';
+      case 'group': return (BRCH[n.open] || BRCH.round)[0] + L(n.body).trim() + (n.close ? (BRCH[n.close] || BRCH.round)[1] : '');
+      case 'abs': return '|' + L(n.body).trim() + '|';
+      case 'norm': return '‖' + L(n.body).trim() + '‖';
+      case 'frac': { const a = w(n.num).trim().replace(/\s+/g, isDiff(n.num) ? '' : ' '), b = w(n.den).trim().replace(/\s+/g, isDiff(n.den) ? '' : ' '); if (isDiff(n.num) && isDiff(n.den)) return a + '/' + b + (flat(n.num).length === 1 ? ' ' : ''); return (isSimple(n.num) ? a : '(' + a + ')') + '/' + (isSimple(n.den) ? b : '(' + b + ')'); }
+      case 'binom': return 'C(' + w(n.n).trim() + ', ' + w(n.k).trim() + ')';
+      case 'sup': { const e = w(n.exp).trim(); if (e === '∘' || e === '°') return w(n.base) + '°'; if (e === '− 1' || e === '−1') return w(n.base) + '⁻¹'; const sup = [...e].every(c => SUPS[c]) ? [...e].map(c => SUPS[c]).join('') : '^' + (isSimple(n.exp) ? e : '(' + e + ')'); return (n.base.t === 'fn' ? w(n.base).trim() + sup + ' ' : w(n.base) + sup); }
+      case 'sub': if (n.base.t === 'fn') return w(n.base).trim() + '_' + w(n.sub).trim() + ' '; return w(n.base) + '_' + (isSimple(n.sub) ? w(n.sub).trim() : '(' + w(n.sub).trim() + ')');
+      case 'subsup': return w({ t: 'sup', base: { t: 'sub', base: n.base, sub: n.sub }, exp: n.exp });
+      case 'prime': return w(n.base) + '′'.repeat(n.n);
+      case 'fact': return w(n.base) + '!';
+      case 'sqrt': { const b = w(n.body).trim(); const r = !n.index ? '√' : (w(n.index).trim() === '3' ? '∛' : w(n.index).trim() + '√'); return r + (isSimple(n.body) ? b : '(' + b + ')'); }
+      case 'fn': { const back = Object.entries(FUNCS).find(([k, v]) => v === n.name); return (back ? back[0] : n.name) + ' '; }
+      case 'big': { const sym = { sum: 'Σ', product: 'Π', integral: '∫', limit: 'lim', union: '⋃', intersection: '⋂' }[n.name] || n.name; let s = sym; const lim = x => isSimple(x) ? w(x).trim() : '(' + w(x).trim() + ')'; if (n.lower) s += '_' + lim(n.lower); if (n.upper) s += '^' + lim(n.upper); return s + ' '; }
+      case 'accent': return w(n.body) + ({ bar: '̄', hat: '̂', vector: '⃗', dot: '̇', tilde: '̃' }[n.kind] || '');
+      case 'table': return '[table]';
+      default: return '';
+    }
+  }
+  function writtenForm(latex) { return written(parse(latex)).replace(/\s{2,}/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim(); }
+
+  // ---------- plain-words gloss: which ideas a formula uses ----------
+  const GLOSS = {
+    eq: 'it says that the two sides are equal',
+    ineq: 'it compares two quantities, saying one is larger or smaller',
+    frac: 'a fraction means the top part divided by the bottom part',
+    power: 'a power means multiplying a number by itself a given number of times',
+    root: 'a square root is the number which, multiplied by itself, gives the number inside',
+    sum: 'a sum, written with the Greek capital sigma, means add up every term as the counter runs from its first value to its last',
+    product: 'a product, written with the Greek capital pi, means multiply all the terms together',
+    integral: 'an integral means adding up infinitely many tiny pieces, like finding the area under a curve',
+    limit: 'a limit is the value that an expression gets closer and closer to',
+    deriv: 'a derivative, said d something by d something, is a rate of change: how fast one quantity changes as another changes',
+    sets: 'it talks about sets, which are collections of things, and which things belong to them',
+    logic: 'it uses logic words such as for all, there exists, and implies',
+    abs: 'the absolute value is the size of a number, ignoring whether it is positive or negative',
+    func: 'it uses a named function, such as sine, cosine or log, which turns one number into another',
+    sub: 'a little number written low, said sub, is a label that tells similar quantities apart',
+    fact: 'a factorial means multiplying together every whole number from 1 up to that number',
+    binom: 'n choose k counts the ways of choosing k things from n things'
+  };
+  function concepts(tree) {
+    const c = new Set();
+    (function walk(n) {
+      if (!n || typeof n !== 'object') return;
+      if (Array.isArray(n)) return n.forEach(walk);
+      switch (n.t) {
+        case 'frac': c.add(isDiff(n.num) && isDiff(n.den) ? 'deriv' : 'frac'); break;
+        case 'sup': if (n.base.t !== 'big') c.add('power'); break;
+        case 'subsup': c.add('power'); c.add('sub'); break;
+        case 'sub': if (n.base.t !== 'big' && !(n.base.t === 'fn')) c.add('sub'); break;
+        case 'sqrt': c.add('root'); break;
+        case 'big': c.add(n.name === 'sum' ? 'sum' : n.name === 'product' ? 'product' : /integral/.test(n.name) ? 'integral' : n.name === 'limit' ? 'limit' : 'sets'); break;
+        case 'abs': c.add('abs'); break;
+        case 'fn': c.add('func'); break;
+        case 'fact': c.add('fact'); break;
+        case 'binom': c.add('binom'); break;
+        case 'set': c.add('sets'); break;
+        case 'op':
+          if (n.v === 'equals') c.add('eq');
+          else if (/^is (less|greater)/.test(n.v)) c.add('ineq');
+          else if (/element of|subset|union|intersection|empty set/.test(n.v)) c.add('sets');
+          else if (/^(for all|there exists|implies|if and only if)$/.test(n.v)) c.add('logic');
+          break;
+      }
+      for (const k of ['body', 'num', 'den', 'base', 'exp', 'sub', 'index', 'lower', 'upper', 'n', 'k']) if (n[k]) walk(n[k]);
+    })(tree);
+    return [...c];
+  }
+  // gloss for a displayed formula; 'seen' is a Set of concepts already explained in this article
+  function gloss(latex, seen) {
+    const cs = concepts(parse(latex)), parts = [];
+    const lead = cs.includes('eq') ? 'it says that the two sides are equal' : cs.includes('ineq') ? GLOSS.ineq : '';
+    for (const k of cs) { if (k === 'eq' || k === 'ineq' || (seen && seen.has(k))) continue; parts.push(GLOSS[k]); if (seen) seen.add(k); }
+    if (!parts.length) return lead ? 'In plain words: ' + lead + '.' : '';
+    return 'In plain words: ' + (lead ? lead + '. ' : '') + parts.map(s => s[0].toUpperCase() + s.slice(1)).join('. ') + '.';
+  }
+  function size(latex) { let n = 0; (function walk(x) { if (!x || typeof x !== 'object') return; if (Array.isArray(x)) return x.forEach(walk); if (/^(num|var|op|set|text|sym|fn)$/.test(x.t)) n++; if (x.t === 'table') n += 50; for (const k of ['body', 'num', 'den', 'base', 'exp', 'sub', 'index', 'lower', 'upper', 'n', 'k']) if (x[k]) walk(x[k]); })(parse(latex)); return n; }
+
+  // ---------- paragraphs ----------
+  // A paragraph is text with inline maths between ⟦ and ⟧, or a display formula starting "$$ ".
+  // Returns events: { say, math? } and { tone, depth }. Text is not chunked here.
+  const MATH_RE = /⟦([^⟧]*)⟧/g;
+  function paragraphEvents(p, opts) {
+    const out = [];
+    let s = p;
+    if (s.startsWith('$$ ')) s = '⟦' + s.slice(3) + '⟧';
+    let last = 0, m; MATH_RE.lastIndex = 0;
+    while ((m = MATH_RE.exec(s))) {
+      const before = s.slice(last, m.index);
+      if (before.trim()) out.push({ say: before.trim() });
+      speak(m[1], opts).forEach(e => out.push(e));
+      last = m.index + m[0].length;
+    }
+    const after = s.slice(last);
+    if (after.trim()) {
+      // punctuation straight after a formula joins the formula's words
+      const prev = out[out.length - 1];
+      if (prev && prev.say != null && /^[,.;:!?]/.test(after.trim())) { const t = after.trim(); const k = t.match(/^[,.;:!?]+/)[0]; prev.say += k; if (t.slice(k.length).trim()) out.push({ say: t.slice(k.length).trim() }); }
+      else out.push({ say: after.trim() });
+    }
+    return out;
+  }
+  // plain readable text for the screen and VoiceOver: written form then the spoken words
+  function paragraphReadable(p) {
+    const disp = p.startsWith('$$ ');
+    const s = disp ? '⟦' + p.slice(3) + '⟧' : p;
+    return s.replace(MATH_RE, (m0, l) => disp ? `Written: ${writtenForm(l)}. Said: ${speakText(l)}.` : `${writtenForm(l)} (said: ${speakText(l)})`);
+  }
+  function plainSpoken(p) { const s = p.startsWith('$$ ') ? '⟦' + p.slice(3) + '⟧' : p; return s.replace(MATH_RE, (m0, l) => speakText(l)); }
+
+  // ---------- earcon design (played by the app with Web Audio) ----------
+  // f1 -> f2 is a glide: opening tones rise, closing tones fall. depth raises pitch a minor third per level.
+  const EARCONS = {
+    'round-open': { name: 'Round bracket, opening: a soft low note, rising', wave: 'sine', f1: 261.63, f2: 329.63, dur: 0.17, gain: 0.7 },
+    'round-close': { name: 'Round bracket, closing: a soft low note, falling', wave: 'sine', f1: 329.63, f2: 261.63, dur: 0.17, gain: 0.7 },
+    'square-open': { name: 'Square bracket, opening: a brighter middle note, rising', wave: 'bright', f1: 440.0, f2: 554.37, dur: 0.17, gain: 0.5 },
+    'square-close': { name: 'Square bracket, closing: a brighter middle note, falling', wave: 'bright', f1: 554.37, f2: 440.0, dur: 0.17, gain: 0.5 },
+    'curly-open': { name: 'Curly brace, opening: a high chime, rising', wave: 'bell', f1: 1046.5, f2: 1318.5, dur: 0.24, gain: 0.5 },
+    'curly-close': { name: 'Curly brace, closing: a high chime, falling', wave: 'bell', f1: 1318.5, f2: 1046.5, dur: 0.24, gain: 0.5 },
+    'frac-start': { name: 'Fraction begins', wave: 'marimba', f1: 293.66, f2: 440.0, dur: 0.18, gain: 0.4, steps: 2 },
+    'frac-end': { name: 'Fraction ends', wave: 'marimba', f1: 440.0, f2: 293.66, dur: 0.18, gain: 0.4, steps: 2 },
+    'power-start': { name: 'Raised to a power: going up', wave: 'sine', f1: 880.0, f2: 1318.5, dur: 0.1, gain: 0.22 },
+    'power-end': { name: 'End of the power: coming down', wave: 'sine', f1: 1318.5, f2: 880.0, dur: 0.1, gain: 0.22 },
+    'root-start': { name: 'Square root begins', wave: 'hum', f1: 196.0, f2: 246.94, dur: 0.22, gain: 0.35 },
+    'root-end': { name: 'Square root ends', wave: 'hum', f1: 246.94, f2: 196.0, dur: 0.22, gain: 0.35 },
+    'think-start': { name: 'Pause and think begins', wave: 'bell', f1: 659.25, f2: 659.25, dur: 0.5, gain: 0.2 },
+    'think-end': { name: 'Time is up: here comes the answer', wave: 'bell', f1: 523.25, f2: 783.99, dur: 0.45, gain: 0.2, steps: 2 }
+  };
+  function earconParams(key, depth, depthBy) {
+    const e = EARCONS[key]; if (!e) return null;
+    const d = Math.max(0, depth | 0), by = depthBy || 'pitch';
+    const mult = (by === 'pitch' || by === 'both') ? Math.pow(2, 3 * Math.min(d, 4) / 12) : 1;
+    const PANS = [0, -0.6, 0.6, -0.9, 0.9];
+    const pan = (by === 'stereo' || by === 'both') ? PANS[Math.min(d, 4)] : 0;
+    return Object.assign({}, e, { key, f1: e.f1 * mult, f2: e.f2 * mult, pan, depth: d });
+  }
+  const api = { tokenize, parse, speak, speakText, speakTree, writtenForm, concepts, gloss, size, paragraphEvents, paragraphReadable, plainSpoken, EARCONS, earconParams, isSimple, flat, MATH_RE };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.MBMath = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>// Maths by Ear text cleaning for listening (from Night Library). Maths between ⟦ ⟧ and display lines "$$ " are protected and kept. Pure functions, used by the build (Node) and tests.
+(function (root) {
+  const DROP = /^(references?|notes?|see also|external links?|bibliography|further reading|sources|citations?|footnotes?|works cited|explanatory notes|notes and references|references and notes|notes and citations|citations and notes|informational notes|gallery|images?|primary sources|secondary sources|general sources|general and cited sources|cited sources|cited works|literature|works|selected works|publications|selected publications|selected bibliography|discography|filmography|in popular culture|popular culture|external links and further reading|bibliography and further reading|further reading and external links|sources and further reading|online sources|print sources|reference|endnotes|annotations|list of .*|timeline|honours|honors|awards and honours|awards and honors|awards|eponyms|legacy and honours|works and publications|written works|books|articles|filmography and discography|notable people|notable members|see also and references|additional reading|notes and sources|portrayal in media|in fiction|in literature|in film|media)$/i;
+  const ALWAYS = /^(references?|notes|see also|external links?|bibliography|further reading|citations?|footnotes?|works cited|explanatory notes|notes and references|references and notes|notes and citations|citations and notes|informational notes|general and cited sources|cited sources|cited works|external links and further reading|bibliography and further reading|further reading and external links|sources and further reading|endnotes|notes and sources|additional reading|general sources|primary sources|secondary sources|selected bibliography)$/i;
+  const NONLATIN = /[\u0370-\u03ff\u1f00-\u1fff\u0400-\u04ff\u0590-\u05ff\u0600-\u06ff\u0700-\u08ff\u0900-\u0dff\u0e00-\u0fff\u1000-\u10ff\u1100-\u11ff\u3000-\u9fff\uac00-\ud7af\uf900-\ufaff]/;
+  const IPA = /[ˈˌːəɪʊɛɔæɑɒʌɜθðʃʒŋɡɐɨʉɯɵɘɞɤɥɲɳɹɻɾʀʁʂʐʎʏʔʕʲˑ̃]/;
+  const LANGLABEL = /^\s*(?:[A-Z][a-z]+(?:[ -][A-Z]?[a-z]+){0,3})\s*:\s*/; // "Ancient Greek: ..."
+  function stripMath(s) {
+    let out = '', i = 0;
+    while (i < s.length) {
+      const k = s.indexOf('{\\displaystyle', i);
+      if (k < 0) { out += s.slice(i); break; }
+      out += s.slice(i, k); let depth = 0, j = k;
+      for (; j < s.length; j++) { if (s[j] === '{') depth++; else if (s[j] === '}') { depth--; if (depth === 0) { j++; break; } } }
+      i = j;
+    }
+    return out;
+  }
+  function cleanParen(inner) {
+    if (!inner.trim()) return '';
+    if (/listen|pronounced|pronunciation|\bIPA\b|romanized|romanised|transliterat|\blit\.|\bborn\b.*\bnée\b/i.test(inner) && inner.length < 200) {
+      inner = inner.split(/;/).filter(p => !/listen|pronounced|pronunciation|\bIPA\b|romani[sz]ed|transliterat|\blit\./i.test(p)).join(';');
+    }
+    const parts = inner.split(/;|,(?=\s*(?:[A-Z][a-z]+ )?[A-Z][a-z]+:)/).map(p => p.trim()).filter(Boolean);
+    const keep = parts.filter(p => !NONLATIN.test(p) && !IPA.test(p) && !(LANGLABEL.test(p) && !/^\s*(?:born|died|reigned|r|c|lit|née|English|also|formerly|officially|abbreviated)\b/i.test(p)) && !/^\/.*\/$/.test(p));
+    return keep.join('; ');
+  }
+  function cleanInline(s) {
+    s = stripMath(s);
+    s = s.replace(/\[(?:\d+|[a-z]|citation needed|note \d+|nb \d+|clarification needed|when\?|who\?|according to whom\?)\]/gi, '');
+    // coordinates
+    s = s.replace(/\b\d{1,3}°\s?\d{0,2}′?\s?\d{0,2}(?:\.\d+)?″?\s?[NS][,\s]+\d{1,3}°\s?\d{0,2}′?\s?\d{0,2}(?:\.\d+)?″?\s?[EW]\b/g, '');
+    s = s.replace(/\b\d{1,3}\.\d+°[NS]\s+\d{1,3}\.\d+°[EW]\b/g, '');
+    s = s.replace(/Coordinates:\s*[^\n.]*/g, '');
+    // parentheses (one level, repeated for nesting)
+    for (let k = 0; k < 3; k++) s = s.replace(/\(([^()]*)\)/g, (m, inner) => { const c = cleanParen(inner); return c ? '\u27e8' + c + '\u27e9' : ''; });
+    s = s.replace(/\u27e8/g, '(').replace(/\u27e9/g, ')');
+    s = s.replace(/\(\s*[;,]?\s*\)/g, '');
+    // listening-friendly abbreviations
+    s = s.replace(/\bc\.\s?(?=\d)/g, 'around ').replace(/\bca\.\s?(?=\d)/g, 'around ');
+    s = s.replace(/\be\.g\.,?/g, 'for example').replace(/\bi\.e\.,?/g, 'that is').replace(/\betc\./g, 'and so on');
+    s = s.replace(/\bfl\.\s?(?=\d)/g, 'active ').replace(/\br\.\s?(?=\d)/g, 'reigned ');
+    s = s.replace(/\bBCE\b/g, 'BC').replace(/\bCE\b/g, 'AD');
+    s = s.replace(/\S*(?:[\u0370-\u03ff\u1f00-\u1fff\u0400-\u04ff\u0590-\u05ff\u0600-\u06ff\u0700-\u08ff\u0900-\u0dff\u0e00-\u0fff\u1000-\u10ff\u3000-\u9fff\uac00-\ud7af]|[\ud800-\udbff][\udc00-\udfff])\S*/g, '');
+    s = s.replace(/°\s?C\b/g, ' degrees Celsius').replace(/°\s?F\b/g, ' degrees Fahrenheit').replace(/°/g, ' degrees');
+    s = s.replace(/\(\s*[;,]?\s*\)/g, '').replace(/\/[^\/\s]{1,12}\/ ?\(hence\)/g, '');
+    s = s.replace(/[\u200b\u200e\u200f\ufeff\u2060]/g, '').replace(/\u00a0/g, ' ');
+    s = s.replace(/\s+([,.;:])/g, '$1').replace(/([,;])\1+/g, '$1').replace(/\s{2,}/g, ' ').replace(/^[,;:\s]+/, '').trim();
+    return s;
+  }
+  // ---- formulas: soften common symbols, drop sentences that are mostly notation ----
+  const MATHCH = /[=+\u2212\u00b1\u00d7\u00f7\u2211\u220f\u222b\u221a\u2264\u2265\u2260\u2208\u2209\u2282\u2286\u222a\u2229\u2200\u2203\u00ac\u223c\u2032\u203e\u2201\u22c5\u00b7^\u2202\u2207\u2192\u21a6\u21d2\u27e8\u27e9|{}<>\u2061\u2062\u2218\u2297\u2295\u2261\u221d\u2026\u2016\u230a\u230b\u2308\u2309\u00b2\u00b3\u00b9\u2070-\u209c\u2124\u211d\u2115\u211a\u2102]/g;
+  const GREEK = { '\u03b1': 'alpha', '\u03b2': 'beta', '\u03b3': 'gamma', '\u03b4': 'delta', '\u03b5': 'epsilon', '\u03b6': 'zeta', '\u03b7': 'eta', '\u03b8': 'theta', '\u03bb': 'lambda', '\u03bc': 'mu', '\u03bd': 'nu', '\u03be': 'xi', '\u03c1': 'rho', '\u03c3': 'sigma', '\u03c4': 'tau', '\u03c6': 'phi', '\u03c7': 'chi', '\u03c8': 'psi', '\u03c9': 'omega', '\u0393': 'gamma', '\u0394': 'delta', '\u0398': 'theta', '\u039b': 'lambda', '\u03a3': 'sigma', '\u03a6': 'phi', '\u03a8': 'psi', '\u03a9': 'omega' };
+  function soften(s) {
+    s = s.replace(/\u2060/g, '').replace(/(^|[^\p{L}])([\u0391-\u03c9])(?=[^\p{L}]|$)/gu, (m, a, g) => a + (GREEK[g] || g));
+    return s.replace(/\u03c0/g, 'pi').replace(/\u221e/g, 'infinity').replace(/\u2248/g, 'approximately').replace(/(\d)\s?\u00d7\s?(\d)/g, '$1 times $2').replace(/(\d)\s?\u2212\s?(\d)/g, '$1 minus $2').replace(/\u2212(?=\d)/g, 'minus ').replace(/(\d)\s?%/g, '$1 percent');
+  }
+  function mathScore(sent) {
+    const sym = (sent.match(MATHCH) || []).length + (sent.match(/=/g) || []).length; // an equals sign counts double
+    const toks = sent.split(/\s+/).filter(Boolean);
+    let vars = 0;
+    for (const t0 of toks) { const t = t0.replace(/^[("'\[]+|[)"'.,;:!?\]]+$/g, ''); if (/^[b-zB-HJ-Z]$/.test(t) || /^[a-zA-Z]\([a-zA-Z0-9, ]*\)$/.test(t) || /^[a-zA-Z][0-9]$/.test(t) || /^[a-zA-Z]{1,2}\d*[!']$/.test(t)) vars++; }
+    return { score: sym + vars, words: toks.length };
+  }
+  // returns { text, dropped, total } for one line of prose
+  function stripFormulas(line) {
+    const sents = soften(line).match(/(?:[^.!?]|[.!?](?=\d))+(?:[.!?]+["'\u201d\u2019)]*|$)\s*/g) || [line];
+    const keep = []; let dropped = 0;
+    for (const s of sents) { const m = mathScore(s); if (m.score >= 6 || (m.score >= 3 && m.score / Math.max(1, m.words) > 0.12)) dropped++; else keep.push(s.trim()); }
+    return { text: keep.join(' ').trim(), dropped, total: sents.length };
+  }
+  const FORMULA_NOTE = 'A formula is omitted here.';
+  const LONG_NOTE = 'A long formula, or a table of formulas, is not read aloud here. The text around it explains the idea.';
+  const LONG_DISPLAY = 70, LONG_INLINE = 45;
+  const MS = (typeof module !== 'undefined' && module.exports) ? require('./mathspeech.js') : root.MBMath;
+  // swap inline maths for private-use placeholders so the text cleaning cannot touch it
+  function protect(line) {
+    const store = [];
+    const s = line.replace(/⟦([^⟧]*)⟧/g, (m, l) => {
+      l = l.trim(); if (!l) return '';
+      if (/^[A-Za-z]$/.test(l) && false) return l;
+      store.push(MS && MS.size(l) > LONG_INLINE ? null : l);
+      return '\uE000' + String.fromCharCode(0xE100 + store.length - 1) + '\uE001';
+    });
+    return { s, restore: t => t.replace(/\uE000(.)\uE001/g, (m, k) => { const l = store[k.charCodeAt(0) - 0xE100]; return l == null ? 'a long formula' : '⟦' + l + '⟧'; }) };
+  }
+  // plain-text sets such as {1, 2, ..., n} become spoken maths, so their braces are heard
+  function mathifyPlain(line) {
+    return line.split(/(⟦[^⟧]*⟧)/).map(seg => seg.startsWith('⟦') ? seg : seg.replace(/\{([^{}]{0,80})\}/g, (m, c) => {
+      if (/[A-Za-z]{3,}/.test(c) || !/^[\w\s,.\-\u2212\u2026+=:|]*$/.test(c)) return m;
+      return '⟦\\{' + c.replace(/\u2212/g, '-').replace(/\.{3}|\u2026/g, '\\ldots ').trim() + '\\}⟧';
+    })).join('');
+  }
+  function letterRatio(s) { const l = (s.match(/[A-Za-z]/g) || []).length; return s.length ? l / s.length : 0; }
+  // Wikipedia plain-text extract (exsectionformat=wiki) -> array of paragraphs; headings as "## text".
+  function cleanWikiExtract(text) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    const out = []; let dropLevel = 0;
+    for (let idx = 0; idx < lines.length; idx++) {
+      const raw = lines[idx];
+      const line = raw.trim(); if (!line) continue;
+      const h = line.match(/^(={2,6})\s*(.*?)\s*\1$/);
+      if (h) {
+        const lvl = h[1].length, title = cleanInline(h[2]);
+        if (dropLevel && lvl > dropLevel) continue;
+        dropLevel = 0;
+        const late = idx > lines.length * 0.5;
+        if (ALWAYS.test(title) || (late && DROP.test(title))) { dropLevel = lvl; continue; }
+        out.push('## ' + title); continue;
+      }
+      if (dropLevel) continue;
+      if (line.startsWith('$$ ')) { // displayed formula: keep it (long or tabular ones are described instead)
+        const lx = line.slice(3).trim().replace(/[,.;]$/, '');
+        if (!lx) continue;
+        if (MS && (MS.size(lx) > LONG_DISPLAY || /\\begin\{/.test(lx))) { if (out[out.length - 1] !== LONG_NOTE) out.push(LONG_NOTE); continue; }
+        out.push('$$ ' + lx); continue;
+      }
+      const prot = protect(mathifyPlain(line));
+      const f0 = stripFormulas(cleanInline(soften(prot.s)));
+      const f = { text: f0.text, dropped: f0.dropped, total: f0.total };
+      if (f.dropped && (!f.text || f.dropped / f.total >= 0.5)) { if (!out.slice(-4).includes(FORMULA_NOTE)) out.push(FORMULA_NOTE); if (f.dropped / f.total >= 0.5 || !f.text) { if (f.text && f.text.length > 120) out.push(prot.restore(cleanInline(f.text))); continue; } }
+      // a sentence ending in a colon followed by a line starting "where" means a displayed equation was left out
+      if (/^where\b/.test(f.text) && out.length && /:$/.test(out[out.length - 1]) && !out.slice(-4).includes(FORMULA_NOTE)) out.push(FORMULA_NOTE);
+      const cP = cleanInline(f.text);
+      if (!cP || cP.length < 3) continue;
+      if (letterRatio(cP.replace(/\uE000.\uE001/g, 'xx')) < 0.55) continue;      // formula or table debris
+      const c = prot.restore(cP);
+      if (/^\^|^Retrieved \d|ISBN|doi:|Archived from/i.test(c)) continue;
+      out.push(c);
+    }
+    // lists: join short runs into one spoken paragraph; drop long lists (tedious to hear)
+    const joined = [];
+    for (let i = 0; i < out.length;) {
+      const isItem = x => x && !x.startsWith('## ') && !x.startsWith('$$ ') && x.length < 70 && x !== FORMULA_NOTE && x !== LONG_NOTE;
+      if (!isItem(out[i])) { joined.push(out[i]); i++; continue; }
+      let j = i; while (isItem(out[j])) j++;
+      const run = out.slice(i, j);
+      if (run.length < 3) joined.push(...run);
+      else if (run.length <= 7) joined.push(run.map(x => x.replace(/[.;:,]$/, '')).join('; ') + '.');
+      i = j;
+    }
+    out.length = 0; out.push(...joined);
+    // drop headings with no body before the next heading of the same or higher level, and trailing headings
+    const res = [];
+    for (let i = 0; i < out.length; i++) {
+      if (out[i].startsWith('## ')) { const nx = out[i + 1]; if (!nx || nx.startsWith('## ')) continue; }
+      res.push(out[i]);
+    }
+    return res;
+  }
+  // Gutenberg plain text section -> paragraphs
+  function cleanGutenberg(text) {
+    const paras = text.replace(/\r/g, '').split(/\n\s*\n/).map(p => p.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
+    const out = [];
+    for (let p of paras) {
+      if (/^\[?(illustration|footnote)/i.test(p)) continue;
+      p = p.replace(/\[\d+\]|\[[A-Z]\]/g, '').replace(/_([^_]+)_/g, '$1').replace(/\s{2,}/g, ' ').trim();
+      if (!p || letterRatio(p) < 0.5) continue;
+      if (p.length < 80 && p === p.toUpperCase() && /[A-Z]/.test(p)) { out.push('## ' + p.charAt(0) + p.slice(1).toLowerCase().replace(/\.$/, '')); continue; }
+      out.push(cleanInline(p));
+    }
+    return out.filter(Boolean);
+  }
+  function words(paras) { return paras.reduce((n, p) => n + p.replace(/^## /, '').split(/\s+/).filter(Boolean).length, 0); }
+  // Keep whole sections up to maxWords; return {paras, truncated}
+  function truncate(paras, maxWords) {
+    if (words(paras) <= maxWords) return { paras, truncated: false };
+    const out = []; let n = 0;
+    for (let i = 0; i < paras.length; i++) {
+      const w = words([paras[i]]);
+      if (n + w > maxWords && n > maxWords * 0.6) break;
+      if (n + w > maxWords * 1.15) break;
+      out.push(paras[i]); n += w;
+    }
+    while (out.length && out[out.length - 1].startsWith('## ')) out.pop();
+    return { paras: out, truncated: true };
+  }
+  // split a paragraph into speakable chunks of at most ~maxChars (sentence boundaries)
+  function chunks(par, maxChars = 220) {
+    const s = par.replace(/^## /, '');
+    const sent = s.match(/(?:[^.!?]|[.!?](?=\d))+(?:[.!?]+["'\u201d\u2019)]*|$)\s*/g) || [s];
+    const out = []; let cur = '';
+    for (let t of sent) {
+      t = t.trim(); if (!t) continue;
+      while (t.length > maxChars * 1.6) { // very long sentence: split at comma/semicolon/space
+        let cut = t.lastIndexOf(', ', maxChars); if (cut < maxChars / 3) cut = t.lastIndexOf('; ', maxChars); if (cut < maxChars / 3) cut = t.lastIndexOf(' ', maxChars);
+        if (cut < 20) cut = maxChars;
+        if (cur) { out.push(cur); cur = ''; }
+        out.push(t.slice(0, cut + 1).trim()); t = t.slice(cut + 1).trim();
+      }
+      if (cur && (cur.length + t.length + 1) > maxChars) { out.push(cur); cur = t; } else cur = cur ? cur + ' ' + t : t;
+    }
+    if (cur) out.push(cur);
+    return out;
+  }
+  const api = { mathifyPlain, LONG_NOTE, protect, FORMULA_NOTE, stripFormulas, mathScore, soften, ALWAYS, cleanWikiExtract, cleanGutenberg, cleanInline, truncate, words, chunks, DROP };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.NLClean = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>// Maths by Ear core logic: random numbers, shuffle, playlist builder (random, ladder, category in course order),
+// weights, resume state and recap. Pure functions (no DOM). Browser: window.MBCore; Node: require.
+(function (root) {
+  const cryptoObj = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto : (typeof require === 'function' ? require('crypto').webcrypto : null);
+  function randInt(n) { // uniform integer in [0, n), rejection sampling, no modulo bias
+    if (n <= 0) return 0;
+    const buf = new Uint32Array(1), lim = Math.floor(0x100000000 / n) * n;
+    let x; do { cryptoObj.getRandomValues(buf); x = buf[0]; } while (x >= lim);
+    return x % n;
+  }
+  function rand01() { const b = new Uint32Array(2); cryptoObj.getRandomValues(b); return ((b[0] >>> 5) * 67108864 + (b[1] >>> 6) + 1) / 9007199254740994; }
+  function shuffle(arr, ri = randInt) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = ri(i + 1); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function weightedOrder(items, wf, r01 = rand01) { return items.map(x => ({ x, k: Math.log(r01()) / Math.max(1e-6, wf(x)) })).sort((a, b) => b.k - a.k).map(o => o.x); }
+  function weightOf(a, weights) { if (!weights) return 1; const w = (weights.cat && weights.cat[a.c]) || 1; return Math.min(8, Math.max(0.05, w)); }
+  function adjustWeights(weights, a, more) {
+    const w = { cat: { ...(weights && weights.cat) } };
+    w.cat[a.c] = Math.min(4, Math.max(0.2, (w.cat[a.c] || 1) * (more ? 1.5 : 0.6)));
+    return w;
+  }
+  // which pieces a selection allows. sel: { mode, cats, levels, one, favourites, length }
+  function filterArticles(index, sel) {
+    const cats = new Set(sel.cats || []), lv = new Set((sel.levels || []).map(String));
+    return index.filter(a => {
+      if (sel.mode === 'category') { if (a.c !== sel.one) return false; }
+      else if (sel.mode === 'favourites') { return (sel.favourites || []).includes(a.id); }
+      else if (!cats.has(a.c)) return false;
+      if (a.tier === 'refresher' && sel.basics !== 'refresher') return false;
+      if (sel.basics === 'refresher' && a.g && a.tier !== 'refresher' && (sel.replaced || []).includes(a.g)) return false;
+      if (lv.size && !lv.has(String(a.lv))) return false;
+      if (sel.mode === 'lessons' && a.src !== 'Original') return false;
+      if (sel.length === 'short' && a.m > 20) return false;
+      if (sel.length === 'long' && a.m < 15 && a.src !== 'Original') return false;
+      return true;
+    });
+  }
+  function selectionKey(sel) { return JSON.stringify([sel.mode, sel.one || '', (sel.cats || []).slice().sort(), (sel.levels || []).slice().sort(), sel.length || '']); }
+  // multi-part pieces (series with a part number) stay together, in order
+  function toUnits(arts) {
+    const units = [], bySeries = new Map();
+    for (const a of arts) {
+      if (!a.series) { units.push({ id: a.id, parts: [a], m: a.m, c: a.c, lv: a.lv, o: a.o, i: a.i, src: a.src }); continue; }
+      let u = bySeries.get(a.series);
+      if (!u) { u = { id: a.series, parts: [], m: 0, c: a.c, lv: a.lv, o: a.o, src: a.src }; bySeries.set(a.series, u); units.push(u); }
+      u.parts.push(a); u.m += a.m;
+    }
+    for (const u of units) u.parts.sort((x, y) => (x.part || 0) - (y.part || 0));
+    return units;
+  }
+  function freshUnits(units, playedSet) {
+    return units.filter(u => u.parts.some(a => !playedSet.has(a.id))).map(u => {
+      const left = u.parts.filter(a => !playedSet.has(a.id)); return left.length === u.parts.length ? u : Object.assign({}, u, { parts: left, m: left.reduce((n, a) => n + a.m, 0) });
+    });
+  }
+  // Random mode: fill the time with a weighted random choice, then a uniform shuffle. No repeats until the selection has all played.
+  function buildPlaylist(index, sel, opts) {
+    const o = Object.assign({ minutes: 480, played: [], weights: null }, opts);
+    const pool = filterArticles(index, sel);
+    if (!pool.length) return { ids: [], minutes: 0, cycleReset: false, poolSize: 0 };
+    const units = toUnits(pool), fresh = freshUnits(units, new Set(o.played));
+    const target = o.minutes === Infinity || o.minutes === 'all' ? Infinity : o.minutes;
+    const pick = (cands, budget) => { const out = []; let m = 0; for (const u of weightedOrder(cands, x => weightOf(x, o.weights))) { if (m >= budget) break; if (m + u.m > budget + 20 && m > 0) continue; out.push(u); m += u.m; } return out; };
+    let chosen, cycleReset = false;
+    if (target === Infinity) { chosen = units.slice(); cycleReset = fresh.length < units.length; }
+    else {
+      chosen = pick(fresh, target);
+      const m = chosen.reduce((n, a) => n + a.m, 0);
+      if (m < target - 20 && units.length > fresh.length) { cycleReset = true; const used = new Set(chosen.map(u => u.id)); chosen = chosen.concat(pick(units.filter(u => !used.has(u.id)), target - m)); }
+    }
+    const order = shuffle(chosen).flatMap(u => u.parts);
+    return { ids: order.map(a => a.id), minutes: order.reduce((n, a) => n + a.m, 0), cycleReset, poolSize: pool.length };
+  }
+  // Course order: level by level, lowest first. Within a level, categories take turns in the catalogue's order
+  // (interleaving), and within a category the original lessons come first in their own order, then the rest at random.
+  function courseOrder(units, catOrder) {
+    const rank = c => { const k = catOrder.indexOf(c); return k < 0 ? 99 : k; };
+    const tie = new Map(units.map(u => [u.id, rand01()]));
+    const byLevel = new Map();
+    for (const u of units) { if (!byLevel.has(u.lv)) byLevel.set(u.lv, []); byLevel.get(u.lv).push(u); }
+    const out = [];
+    for (const lv of [...byLevel.keys()].sort((a, b) => a - b)) {
+      const queues = new Map();
+      byLevel.get(lv).forEach(u => { if (!queues.has(u.c)) queues.set(u.c, []); queues.get(u.c).push(u); });
+      for (const q of queues.values()) q.sort((x, y) => (x.o - y.o) || ((y.i ? 1 : 0) - (x.i ? 1 : 0)) || (tie.get(x.id) - tie.get(y.id)));
+      const cats = [...queues.keys()].sort((a, b) => rank(a) - rank(b));
+      let left = true;
+      while (left) { left = false; for (const c of cats) { const q = queues.get(c); if (q.length) { out.push(q.shift()); left = true; } } }
+    }
+    return out;
+  }
+  // Ladder and one-category modes: carry on from the first unheard piece in course order.
+  function buildOrdered(index, sel, opts) {
+    const o = Object.assign({ minutes: 480, played: [], catOrder: [] }, opts);
+    const pool = filterArticles(index, sel);
+    if (!pool.length) return { ids: [], minutes: 0, cycleReset: false, poolSize: 0 };
+    const units = toUnits(pool);
+    let fresh = freshUnits(units, new Set(o.played)), cycleReset = false;
+    if (!fresh.length) { fresh = units; cycleReset = true; }
+    const ordered = courseOrder(fresh, o.catOrder);
+    const target = o.minutes === Infinity || o.minutes === 'all' ? Infinity : o.minutes;
+    const out = []; let m = 0;
+    for (const u of ordered) { if (m >= target) break; out.push(u); m += u.m; }
+    const order = out.flatMap(u => u.parts);
+    return { ids: order.map(a => a.id), minutes: m, cycleReset, poolSize: pool.length };
+  }
+  function markPlayed(played, id, pool) {
+    const p = played.includes(id) ? played.slice() : played.concat([id]);
+    const ids = new Set(pool.map(a => a.id));
+    if (pool.length && pool.every(a => p.includes(a.id))) return p.filter(x => !ids.has(x));
+    return p;
+  }
+  // Recap: key ideas from the last few pieces heard before this session began, plus quiz questions missed before.
+  // log: [{ id, at }], newest last. quiz: { qid: { right, wrong, at } }.
+  function buildRecap(log, index, sessionStart, quizState, opts) {
+    const o = Object.assign({ pieces: 3, ideas: 4, missed: 2 }, opts);
+    const by = new Map(index.map(a => [a.id, a]));
+    const seen = new Set(), recent = [];
+    for (let i = log.length - 1; i >= 0 && recent.length < o.pieces; i--) {
+      const e = log[i]; if (!e || e.at >= sessionStart || seen.has(e.id)) continue;
+      const a = by.get(e.id); if (!a || !a.k || !a.k.length) continue;
+      seen.add(e.id); recent.push(a);
+    }
+    const ideas = [];
+    recent.forEach(a => a.k.slice(0, a.src === 'Original' ? 2 : 1).forEach(k => ideas.push({ id: a.id, t: a.t, k })));
+    const missed = Object.entries(quizState || {}).filter(([q, s]) => s && s.wrong > (s.right || 0)).sort((x, y) => (y[1].at || 0) - (x[1].at || 0)).slice(0, o.missed).map(([q]) => {
+      const [id, n] = q.split('#'); const a = by.get(id); return a && a.q && a.q[+n] ? { id, n: +n, q: a.q[+n] } : null;
+    }).filter(Boolean);
+    return { ideas: ideas.slice(0, o.ideas), missed };
+  }
+  function fmtMinutes(min) {
+    min = Math.round(min);
+    if (min < 60) return `${min} minute${min === 1 ? '' : 's'}`;
+    const h = Math.floor(min / 60), r = min % 60; const hs = `${h} hour${h === 1 ? '' : 's'}`;
+    return r ? `${hs} ${r} minute${r === 1 ? '' : 's'}` : hs;
+  }
+  function encodeResume(s) { return JSON.stringify({ v: 2, items: s.items, pos: s.pos | 0, para: s.para | 0, key: s.key || '', at: s.at || Date.now() }); }
+  function decodeResume(str, index) {
+    try {
+      const d = JSON.parse(str); if (!d || d.v !== 2 || !Array.isArray(d.items)) return null;
+      const ids = new Set(index.map(a => a.id));
+      const items = d.items.filter(x => x && ids.has(x.id));
+      if (!items.length) return null;
+      let pos = Math.min(Math.max(0, d.pos | 0), items.length - 1);
+      if (items.length !== d.items.length) { const want = d.items[d.pos] && d.items[d.pos].id; const k = items.findIndex(x => x.id === want); pos = k >= 0 ? k : Math.min(pos, items.length - 1); }
+      return { items, pos, para: Math.max(0, d.para | 0), key: d.key || '', at: d.at || 0 };
+    } catch (e) { return null; }
+  }
+
+  // ---------- version 2: the Grand Course, threads, refreshers, night and day pace, "slightly scarier" ----------
+  const isLesson = a => a.src === 'Original';
+  // Lessons in course order. basics 'refresher': each refresher replaces its group of full lessons.
+  function courseLessons(index, basics) {
+    const L = index.filter(isLesson);
+    const refs = L.filter(a => a.tier === 'refresher');
+    const replaced = new Set(basics === 'refresher' ? refs.map(a => a.rep) : []);
+    return L.filter(a => a.tier === 'refresher' ? basics === 'refresher' : !(a.g && replaced.has(a.g)))
+      .sort((x, y) => (x.st - y.st) || ((x.tier === 'refresher' ? 0 : 1) - (y.tier === 'refresher' ? 0 : 1)) || x.id.localeCompare(y.id));
+  }
+  const PACE = {
+    night: { recapEvery: 2, fillerEvery: 1, rate: 0.82, think: 10 },
+    day: { recapEvery: 5, fillerEvery: 2, rate: 0.95, think: 7 }
+  };
+  // Choose a reading to follow a lesson. Night: gentle (stories, light pieces, at or below the lesson's level).
+  // Day: same thread, as close to the lesson's level as possible.
+  function pickFiller(pool, lesson, pace, used) {
+    const ok = pool.filter(a => !used.has(a.id));
+    if (!ok.length) return null;
+    const T = lesson.th, lv = lesson.lv;
+    const score = a => {
+      let s = rand01() * 0.5;
+      if (pace === 'night') { if (a.th === T) s += 2; if (a.th === 'stories') s += 1.6; if (a.l) s += 1; if (a.lv <= lv) s += 1.5; s -= Math.max(0, a.lv - lv) * 2; s -= a.m > 40 ? 1 : 0; }
+      else { if (a.th === T) s += 3; s -= Math.abs(a.lv - lv) * 1.2; if (a.lv > lv + 1) s -= 3; }
+      return s;
+    };
+    return ok.map(a => ({ a, s: score(a) })).sort((x, y) => y.s - x.s)[0].a;
+  }
+  function recapItem(ids) { return { id: ids[ids.length - 1], recap: true, of: ids.slice() }; }
+  // opts: { pace, basics, fromStep, played, minutes, fillers: true }
+  function buildCourse(index, opts) {
+    const o = Object.assign({ pace: 'night', basics: 'full', fromStep: null, fromId: null, played: [], minutes: 600, fillers: true }, opts);
+    const P = PACE[o.pace] || PACE.night;
+    const lessons = courseLessons(index, o.basics);
+    const played = new Set(o.played);
+    let start = 0, cycleReset = false;
+    if (o.fromId) { start = Math.max(0, lessons.findIndex(a => a.id === o.fromId)); }
+    else if (o.fromStep != null) { start = lessons.findIndex(a => a.st >= o.fromStep); if (start < 0) start = 0; }
+    else { start = lessons.findIndex(a => !played.has(a.id)); if (start < 0) { start = 0; cycleReset = true; } }
+    const pool = o.fillers ? index.filter(a => !isLesson(a) && !played.has(a.id)) : [];
+    const used = new Set(), out = []; let m = 0, since = [], n = 0;
+    const target = o.minutes === Infinity || o.minutes === 'all' ? Infinity : o.minutes;
+    const add = it => { out.push(it); m += it.recap ? 1 : (index.find(a => a.id === it.id) || { m: 0 }).m; };
+    for (let i = start; i < lessons.length && m < target; i++) {
+      const a = lessons[i]; add({ id: a.id }); since.push(a.id); n++;
+      if (P.recapEvery && since.length >= P.recapEvery && i + 1 < lessons.length) { add(recapItem(since)); since = []; }
+      if (o.fillers && n % P.fillerEvery === 0 && m < target) { const f = pickFiller(pool, a, o.pace, used); if (f) { used.add(f.id); add({ id: f.id }); } }
+    }
+    // after the last lesson, carry on through the remaining readings, gently ordered by level
+    if (m < target && o.fillers) {
+      const rest = pool.filter(a => !used.has(a.id)).sort((x, y) => (x.lv - y.lv) || (rand01() - 0.5));
+      for (const a of rest) { if (m >= target) break; add({ id: a.id }); }
+    }
+    const first = out.length ? out[0].id : null;
+    return { items: out, ids: out.map(x => x.id), minutes: m, cycleReset, firstLesson: first, lessons: lessons.length, startIndex: start };
+  }
+  // One thread: its lessons in course order, with that thread's readings placed after the last lesson at or below their level.
+  function buildThread(index, thread, opts) {
+    const o = Object.assign({ basics: 'full', played: [], minutes: 600, pace: 'night' }, opts);
+    const lessons = courseLessons(index, o.basics).filter(a => a.th === thread);
+    const readings = index.filter(a => !isLesson(a) && a.th === thread).sort((x, y) => (x.lv - y.lv) || (x.i ? -1 : 0) - (y.i ? -1 : 0) || x.t.localeCompare(y.t));
+    const slots = lessons.map(() => []), head = [];
+    for (const r of readings) { let k = -1; lessons.forEach((l, j) => { if (l.lv <= r.lv) k = j; }); (k < 0 ? head : slots[k]).push(r); }
+    let seq = head.slice(); lessons.forEach((l, j) => { seq.push(l); seq = seq.concat(slots[j]); });
+    const played = new Set(o.played);
+    let start = seq.findIndex(a => !played.has(a.id)), cycleReset = false; if (start < 0) { start = 0; cycleReset = true; }
+    const P = PACE[o.pace] || PACE.night;
+    const out = []; let m = 0, since = [];
+    const target = o.minutes === Infinity || o.minutes === 'all' ? Infinity : o.minutes;
+    for (let i = start; i < seq.length && m < target; i++) {
+      const a = seq[i]; if (played.has(a.id) && !cycleReset && !isLesson(a)) continue;
+      out.push({ id: a.id }); m += a.m;
+      if (isLesson(a)) { since.push(a.id); if (since.length >= P.recapEvery) { out.push(recapItem(since)); m += 1; since = []; } }
+    }
+    return { items: out, ids: out.map(x => x.id), minutes: m, cycleReset, poolSize: seq.length };
+  }
+  // "Slightly scarier than last week": look at the last seven days, then go one notch further, with recaps woven in.
+  function buildScarier(index, log, opts) {
+    const o = Object.assign({ now: Date.now(), days: 7, basics: 'full', played: [], minutes: 120, recapEvery: 3 }, opts);
+    const by = new Map(index.map(a => [a.id, a]));
+    const recent = (log || []).filter(e => e && o.now - e.at <= o.days * 86400000).map(e => by.get(e.id)).filter(Boolean);
+    const lessons = courseLessons(index, o.basics);
+    const played = new Set(o.played);
+    const heardL = recent.filter(isLesson);
+    const maxStep = heardL.length ? Math.max(...heardL.map(a => a.st)) : 0;
+    const maxLv = recent.length ? Math.max(...recent.map(a => a.lv)) : 1;
+    const notch = Math.min(5, maxLv + (recent.length ? 1 : 0));
+    const next = lessons.filter(a => a.st > maxStep && !played.has(a.id));
+    const readings = index.filter(a => !isLesson(a) && !played.has(a.id) && (a.lv === notch || a.lv === maxLv) && !recent.includes(a));
+    const prevIds = []; const seenR = new Set();
+    for (let i = heardL.length - 1; i >= 0 && prevIds.length < 3; i--) if (!seenR.has(heardL[i].id)) { seenR.add(heardL[i].id); prevIds.unshift(heardL[i].id); }
+    const out = []; let m = 0, since = [];
+    if (prevIds.length) { out.push({ id: prevIds[prevIds.length - 1], recap: true, of: prevIds, previously: true }); m += 1; }
+    const used = new Set(); let k = 0;
+    const want = next.slice(); const target = o.minutes;
+    while (m < target && (want.length || readings.some(r => !used.has(r.id)))) {
+      let a = null;
+      if (want.length && (k % 2 === 0 || !readings.some(r => !used.has(r.id)))) a = want.shift();
+      else { const ref = want[0] || next[next.length - 1] || { th: 'stories', lv: notch }; a = pickFiller(readings, Object.assign({}, ref, { lv: notch }), 'day', used); if (a) used.add(a.id); }
+      if (!a) break;
+      out.push({ id: a.id }); m += a.m; since.push(a.id); k++;
+      if (since.length >= o.recapEvery) { out.push(recapItem(since)); m += 1; since = []; }
+    }
+    return { items: out, ids: out.map(x => x.id), minutes: m, maxStep, maxLv, notch, recentCount: recent.length, previously: prevIds };
+  }
+  // Key ideas to speak for a recap item.
+  function recapIdeas(index, ids, perLesson) {
+    const by = new Map(index.map(a => [a.id, a]));
+    return ids.map(id => by.get(id)).filter(Boolean).map(a => ({ id: a.id, t: a.t, k: (a.k || []).slice(0, a.src === 'Original' ? (perLesson || 2) : 1) }));
+  }
+  const api = { courseLessons, PACE, pickFiller, buildCourse, buildThread, buildScarier, recapIdeas, randInt, rand01, shuffle, weightedOrder, weightOf, adjustWeights, filterArticles, selectionKey, toUnits, buildPlaylist, courseOrder, buildOrdered, markPlayed, buildRecap, fmtMinutes, encodeResume, decodeResume };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.MBCore = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>// Maths by Ear version 3: Professor Pennyfeather's lectures. UI, speech player with earcons, spoken questions, recaps,
+// the Grand Course with night and day pace, threads, refreshers and the "slightly scarier" playlist. Engine from version 1.
+(function () {
+  'use strict';
+  const C = window.MBCore, CL = window.NLClean, M = window.MBMath;
+  const $ = id => document.getElementById(id);
+  const K = 'mbe.v3.';
+  const load = (k, d) => { try { const v = localStorage.getItem(K + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
+  const save = (k, v) => { try { localStorage.setItem(K + k, JSON.stringify(v)); } catch (e) {} };
+  const VERSION = 3;
+  const DEFAULTS = {
+    voiceURI: '', rate: 0.82, mathRate: 0.8, think: 10, pace: 'night', basics: 'full', questions: true, links: true, thread: 'number', structure: 'brackets', structTones: true, depthBy: 'pitch', fracStyle: 'full', toneVol: 0.9,
+    thinkTones: true, recap: true, quiz: true, quizWait: 15, titles: true, headings: true, sourceLine: true, plugTip: true, announcePieces: false,
+    gap: 2, wakeLock: true, keepAlive: false, autoContinue: true, sleep: 'off',
+    mode: 'course', one: 'brackets', cats: null, levels: null, hours: '10', length: 'any'
+  };
+  let S = Object.assign({}, DEFAULTS, load('settings', {}));
+  const saveS = () => save('settings', S);
+  let IDX = null, BY = {}, CATS = [], LEVELS = [];
+  const packs = {};
+  const st = { items: [], pos: 0, para: 0, chunk: 0, playing: false, key: '', token: 0, utter: null, uStart: 0, uExpect: 0, retries: 0, pre: [], sleepAt: 0, stopAtEnd: false, wake: null, tipDone: false, recapDone: false, sessionStart: Date.now(), pitems: null, lastMath: null, quiz: null };
+  window.MBE = { st, S: () => S, idx: () => IDX, toneLog: [] }; // for tests
+
+  // ---------- helpers ----------
+  function announce(msg) { const l = $('live'); l.textContent = ''; setTimeout(() => { l.textContent = msg; }, 60); }
+  function setNow(msg) { $('now').textContent = msg; }
+  function el(tag, attrs, ...kids) { const e = document.createElement(tag); for (const k in (attrs || {})) { if (k === 'text') e.textContent = attrs[k]; else if (k.startsWith('on')) e.addEventListener(k.slice(2), attrs[k]); else e.setAttribute(k, attrs[k]); } kids.forEach(k => k && e.append(k)); return e; }
+  function radios(fs, name, opts, cur, onch) {
+    fs.querySelectorAll('label').forEach(x => x.remove());
+    opts.forEach(([v, lab]) => { const i = el('input', { type: 'radio', name, value: v }); i.checked = String(cur) === String(v); i.addEventListener('change', () => onch(v)); fs.append(el('label', {}, i, lab)); });
+  }
+  function checks(fs, name, opts, curList, onch) {
+    fs.querySelectorAll('label').forEach(x => x.remove());
+    opts.forEach(([v, lab]) => { const i = el('input', { type: 'checkbox', name, value: v }); i.checked = curList.includes(v); i.addEventListener('change', () => onch(v, i.checked)); fs.append(el('label', {}, i, lab)); });
+  }
+  function art(id) { return BY[id]; }
+  function catName(c) { const x = CATS.find(r => r[0] === c); return x ? x[1] : c; }
+  function levelName(l) { const x = LEVELS.find(r => String(r[0]) === String(l)); return x ? x[1] : 'Level ' + l; }
+  async function pack(cat) {
+    if (!packs[cat]) packs[cat] = fetch('packs/' + cat + '.json').then(r => { if (!r.ok) throw new Error('pack ' + cat + ' ' + r.status); return r.json(); }).then(d => { const m = {}; d.articles.forEach(a => { m[a.id] = a.p; }); return m; }).catch(e => { delete packs[cat]; throw e; });
+    return packs[cat];
+  }
+  async function textOf(id) { const a = art(id); const m = await pack(a.c); return m[id] || []; }
+  function mathOpts() { return { mode: S.structure, structTones: S.structTones && S.structure !== 'words', fracStyle: S.fracStyle }; }
+
+  // ---------- voices ----------
+  let voices = [];
+  function synth() { return window.speechSynthesis; }
+  function refreshVoices() {
+    if (!synth()) return;
+    voices = synth().getVoices() || [];
+    const sel = $('s-voice'); sel.innerHTML = '';
+    const en = voices.filter(v => /^en/i.test(v.lang));
+    const gb = en.filter(v => /GB/i.test(v.lang)), other = en.filter(v => !/GB/i.test(v.lang));
+    sel.append(el('option', { value: '', text: 'Automatic: best British English voice' }));
+    [...gb, ...other].forEach(v => sel.append(el('option', { value: v.voiceURI, text: `${v.name} (${v.lang})` })));
+    sel.value = voices.some(v => v.voiceURI === S.voiceURI) ? S.voiceURI : '';
+  }
+  function pickVoice() {
+    if (S.voiceURI) { const v = voices.find(x => x.voiceURI === S.voiceURI); if (v) return v; }
+    const gb = voices.filter(v => /en[-_]GB/i.test(v.lang));
+    const pref = gb.find(v => /premium|enhanced/i.test(v.name)) || gb.find(v => /daniel|serena|kate|arthur|martha|stephanie|oliver/i.test(v.name)) || gb[0];
+    return pref || voices.find(v => /^en/i.test(v.lang)) || null;
+  }
+
+  // ---------- sound: earcons with Web Audio ----------
+  let actx = null, master = null;
+  function ensureAudio() { // call inside a tap: iOS only starts audio from a user gesture
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = 'playback'; // iOS 17: not silenced by the ring switch
+    } catch (e) {}
+    try {
+      if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); master = actx.createGain(); master.connect(actx.destination); }
+      if (actx.state !== 'running') actx.resume().catch(() => {});
+    } catch (e) { actx = null; }
+    return actx;
+  }
+  function voice(t0, p, freqAt, type, gain, dur, partial) {
+    const o = actx.createOscillator(); o.type = type;
+    const g = actx.createGain(); let out = g;
+    freqAt(o.frequency, t0);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g);
+    if (partial) { const o2 = actx.createOscillator(); o2.type = 'sine'; freqAt(o2.frequency, t0, partial.mult); const g2 = actx.createGain(); g2.gain.setValueAtTime(0.0001, t0); g2.gain.exponentialRampToValueAtTime(gain * partial.gain, t0 + 0.008); g2.gain.exponentialRampToValueAtTime(0.0001, t0 + dur * partial.decay); o2.connect(g2); g2.connect(p); o2.start(t0); o2.stop(t0 + dur + 0.05); }
+    out.connect(p); o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  // returns the time the sound lasts, in seconds
+  function playEarcon(key, depth) {
+    const e = M.earconParams(key, depth, S.depthBy); if (!e) return 0;
+    const tl = window.MBE.toneLog; tl.push({ key, depth: e.depth, f1: Math.round(e.f1), f2: Math.round(e.f2), pan: e.pan }); if (tl.length > 300) tl.splice(0, 100);
+    if (!ensureAudio() || actx.state !== 'running') return e.dur;
+    const t0 = actx.currentTime + 0.02;
+    let p = master;
+    if (actx.createStereoPanner) { const pn = actx.createStereoPanner(); pn.pan.value = e.pan; pn.connect(master); p = pn; }
+    const vol = e.gain * S.toneVol;
+    const glide = (f1, f2, d) => (param, t, mult = 1) => { param.setValueAtTime(f1 * mult, t); param.exponentialRampToValueAtTime(f2 * mult, t + d); };
+    if (e.steps === 2) { // two notes: low then high, or high then low
+      const d = e.dur / 2;
+      [e.f1, e.f2].forEach((f, i) => voice(t0 + i * d, p, glide(f, f, d), 'sine', vol, d * (e.wave === 'bell' ? 1.6 : 0.95), { mult: e.wave === 'bell' ? 2.76 : 4, gain: 0.35, decay: 0.4 }));
+    } else if (e.wave === 'bell') voice(t0, p, glide(e.f1, e.f2, e.dur * 0.6), 'sine', vol, e.dur * 1.4, { mult: 2.76, gain: 0.45, decay: 0.5 });
+    else if (e.wave === 'bright') voice(t0, p, glide(e.f1, e.f2, e.dur), 'triangle', vol, e.dur, { mult: 2, gain: 0.55, decay: 0.7 });
+    else if (e.wave === 'hum') {
+      const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900; f.connect(p);
+      voice(t0, f, glide(e.f1, e.f2, e.dur), 'triangle', vol, e.dur, { mult: 2, gain: 0.3, decay: 0.8 });
+    } else voice(t0, p, glide(e.f1, e.f2, e.dur), e.wave, vol, e.dur);
+    return e.dur * (e.wave === 'bell' ? 1.4 : 1);
+  }
+
+  // ---------- speech engine: short chunks with a watchdog ----------
+  function speak(text, done, rate) {
+    const sy = synth(); const tok = ++st.token;
+    if (!sy) { setTimeout(() => tok === st.token && done(), 50); return; }
+    const r = rate || S.rate;
+    const u = new SpeechSynthesisUtterance(text);
+    const v = pickVoice(); if (v) u.voice = v; u.lang = (v && v.lang) || 'en-GB'; u.rate = r; u.pitch = 1; u.volume = 1;
+    let finished = false;
+    const fin = () => { if (finished || tok !== st.token) return; finished = true; st.utter = null; done(); };
+    u.onend = fin; u.onerror = e => { if (e && (e.error === 'interrupted' || e.error === 'canceled')) return; fin(); };
+    st.utter = u; st.uText = text; st.uDone = done; st.uRate = r; st.uStart = Date.now(); st.uExpect = 3000 + text.length * 85 / Math.max(0.3, r);
+    try { sy.speak(u); } catch (e) { setTimeout(fin, 100); }
+  }
+  function primeSpeech() { try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; synth() && synth().speak(u); } catch (e) {} }
+  function stopSpeech() { st.token++; st.utter = null; clearTimeout(st.waitTimer); try { synth() && synth().cancel(); } catch (e) {} }
+  function watchdog() {
+    if (st.playing && st.utter) {
+      const age = Date.now() - st.uStart, sy = synth();
+      const stalled = age > st.uExpect * 2 + 4000 || (age > 4000 && sy && !sy.speaking && !sy.pending);
+      if (stalled) {
+        const text = st.uText, done = st.uDone, r = st.uRate;
+        st.retries++;
+        if (st.retries > 2) { st.retries = 0; stopSpeech(); done(); }
+        else { stopSpeech(); try { sy.resume(); } catch (e) {} speak(text, done, r); }
+      }
+    }
+    if (st.playing && st.sleepAt && Date.now() >= st.sleepAt) { st.sleepAt = 0; sleepNow(); }
+  }
+  setInterval(watchdog, 1500);
+  // run one item: { say, math } | { tone, depth } | { wait } (milliseconds)
+  function runItem(it, done) {
+    if (it.say != null) return speak(it.say, done, it.math ? S.rate * S.mathRate : S.rate);
+    const tok = ++st.token;
+    const later = ms => { st.waitTimer = setTimeout(() => { if (tok === st.token) done(); }, ms); };
+    if (it.tone) { const d = playEarcon(it.tone, it.depth); return later(Math.round(d * 1000) + 70); }
+    if (it.wait) return later(it.wait);
+    later(0);
+  }
+  function runSeq(items, done) { // a small sequence outside the article flow (tests, gallery, quiz)
+    let i = 0; const nx = () => { if (i >= items.length) return done && done(); runItem(items[i++], nx); }; nx();
+  }
+  // turn a paragraph into items
+  function mergeSays(ev) {
+    const out = [];
+    for (const e of ev) {
+      const prev = out[out.length - 1];
+      if (e.say != null && prev && prev.say != null && !!prev.math === !!e.math && (prev.say + e.say).length < 220) prev.say += ' ' + e.say;
+      else out.push(Object.assign({}, e));
+    }
+    return out.flatMap(e => e.say != null && !e.math && e.say.length > 200 ? CL.chunks(e.say, 200).map(t => ({ say: t })) : [e]);
+  }
+  function paraItems(p) {
+    const o = mathOpts();
+    if (p.startsWith('## ')) return [{ say: `Section: ${p.slice(3)}.` }];
+    if (p.startsWith('?? ')) {
+      if (!S.questions) return [];
+      const ev = M.paragraphEvents(p.slice(3).replace(/^(While I pour\.|While I pour the tea\.)\s*/, ''), o);
+      return [].concat(S.thinkTones ? [{ tone: 'think-start' }] : [], [{ say: tea() }], mergeSays(ev), [{ wait: Math.round(S.think * 1000) }], S.thinkTones ? [{ tone: 'think-end' }] : [{ say: 'Time is up.' }]);
+    }
+    if (p.startsWith('=> ')) return S.questions ? [{ say: ans() }].concat(mergeSays(M.paragraphEvents(p.slice(3), o))) : [];
+    if (p.startsWith('%% ')) return [{ say: p.slice(3) }];
+    const items = mergeSays(M.paragraphEvents(p, o));
+    if (p.includes('⟦') || p.startsWith('$$ ')) st.lastMath = items;
+    return items;
+  }
+
+  // ---------- the Professor's little phrases ----------
+  let teaN = 0;
+  const TEA = ['A question for you, while I pour the tea.', 'Now, a question. Take a sip of tea and think.', 'Here is something to ponder while the kettle sings.', 'A question. Take your time; I shall stir the pot.', 'Think about this one while I pass the biscuits.'];
+  const ANS = ['And the answer.', 'Now, the answer.', 'Here is the answer.', 'And so, the answer.'];
+  const tea = () => TEA[teaN++ % TEA.length], ans = () => ANS[teaN % ANS.length];
+
+  // ---------- player ----------
+  function current() { return st.items[st.pos] && art(st.items[st.pos].id); }
+  function persist() { save('resume', JSON.parse(C.encodeResume({ items: st.items, pos: st.pos, para: st.para, key: st.key, at: Date.now() }))); }
+  function minsLeftPiece(paras) { let w = 0; for (let i = st.para; i < paras.length; i++) w += paras[i].split(/\s+/).length; return w / (150 * S.rate / 0.9); }
+  function playlistLeft() { let m = 0; for (let i = st.pos + 1; i < st.items.length; i++) m += (art(st.items[i].id) || { m: 0 }).m; return m; }
+  function shortTitle(id) { const a = art(id); return a ? a.t.replace(/^Brackets and Braces, part (\d+): /, 'Brackets and Braces part $1, ') : ''; }
+  function linksLine(a) {
+    if (!a || a.src !== 'Original' || !S.links) return '';
+    const b = (a.b || []).map(shortTitle).filter(Boolean), l = (a.ld || []).map(shortTitle).filter(Boolean);
+    let s = '';
+    if (b.length) s += ` This lecture builds on ${b.join(' and ')}.`;
+    if (l.length) s += ` It leads on to ${l.join(' and ')}.`;
+    return s;
+  }
+  function titleLine(a) {
+    if (a.src === 'Original') return `${a.tier === 'refresher' ? 'A refresher lecture' : 'A lecture'} from ${catName(a.c).split(':')[0]}, level ${a.lv}. ${a.t}. About ${C.fmtMinutes(a.m)}.${linksLine(a)}`;
+    return `${catName(a.c).split(':')[0]}, level ${a.lv}. ${a.t}. About ${C.fmtMinutes(a.m)}.`;
+  }
+  function nowText(a) { const it = st.items[st.pos]; return it && it.recap ? `Now playing ${st.pos + 1} of ${st.items.length}: a short recap, previously.` : `Now playing ${st.pos + 1} of ${st.items.length}: ${a.t}. ${catName(a.c)}, level ${a.lv}.`; }
+  function updateUI() {
+    $('b-play').textContent = st.playing ? 'Pause' : 'Play';
+    $('b-play').setAttribute('aria-label', st.playing ? 'Pause' : 'Play: the Professor carries on where you left off');
+    const a = current();
+    const favs = load('favs', []);
+    $('b-fav').textContent = a && favs.includes(a.id) ? 'Remove this piece from favourites' : 'Add this piece to favourites';
+    $('b-fav').setAttribute('aria-pressed', a && favs.includes(a.id) ? 'true' : 'false');
+    const ol = $('upnext'); ol.innerHTML = '';
+    st.items.slice(st.pos + 1, st.pos + 9).forEach(it => { const b = art(it.id); if (b) ol.append(el('li', { text: it.recap ? 'A short recap: previously.' : `${b.t}. ${catName(b.c).split(':')[0]}, level ${b.lv}, about ${C.fmtMinutes(b.m)}` })); });
+    if (!ol.children.length) ol.append(el('li', { text: 'Nothing queued yet. Press Play and the Professor will choose.' }));
+    const r = C.decodeResume(JSON.stringify(load('resume', null)), IDX ? IDX.articles : []);
+    $('b-resume').hidden = st.playing || !r || (st.items.length > 0);
+    if (r && !$('b-resume').hidden) { const ra = art(r.items[r.pos].id); $('b-resume').textContent = `Resume where I stopped: ${r.items[r.pos].recap ? 'a short recap' : ra.t}`; }
+  }
+  async function startPiece(fromPara, intro) {
+    const it = st.items[st.pos]; const a = it && art(it.id);
+    if (!a) return endPlaylist();
+    let paras;
+    if (it.recap) paras = recapParas(it);
+    else try { paras = await textOf(a.id); } catch (e) { setNow('Could not load the pieces. Check the internet connection and press Play again.'); announce('Could not load the pieces.'); pause(true); return; }
+    if (!st.playing) return;
+    st.paras = paras; st.para = Math.min(fromPara || 0, Math.max(0, paras.length - 1)); st.chunk = 0; st.pitems = null;
+    st.pre = [].concat(intro || []);
+    if (S.titles && !it.recap) st.pre.push({ say: st.para ? `Continuing: ${a.t}.` : titleLine(a) });
+    setNow(nowText(a)); if (S.announcePieces) announce(nowText(a));
+    mediaMeta(it.recap ? { t: 'Previously: a short recap', c: a.c } : a); persist(); updateUI();
+    const nx = st.items[st.pos + 1]; if (nx && art(nx.id)) pack(art(nx.id).c).catch(() => {});
+    step();
+  }
+  function step() {
+    if (!st.playing) return;
+    if (st.pre.length) { let t = st.pre.shift(); if (typeof t === 'string') t = { say: t }; return runItem(t, () => { st.retries = 0; step(); }); }
+    const paras = st.paras || [];
+    if (st.para >= paras.length) return pieceDone();
+    const p = paras[st.para];
+    if (p.startsWith('## ') && !S.headings) { st.para++; st.chunk = 0; st.pitems = null; return step(); }
+    if (!st.pitems) st.pitems = paraItems(p);
+    if (st.chunk >= st.pitems.length) { st.para++; st.chunk = 0; st.pitems = null; persist(); return step(); }
+    runItem(st.pitems[st.chunk], () => { st.retries = 0; st.chunk++; step(); });
+  }
+  function logHeard(a) { const log = load('log', []); log.push({ id: a.id, at: Date.now() }); save('log', log.slice(-200)); }
+  function pieceDone() {
+    const a = current(), it = st.items[st.pos];
+    if (it && it.recap) { st.pos++; st.para = 0; persist(); if (st.pos >= st.items.length) return endPlaylist(); return startPiece(0); }
+    const fin = () => {
+      if (a) {
+        const pool = ORDERED_V2.includes(S.mode) ? IDX.articles : C.filterArticles(IDX.articles, selFromSettings());
+        save('played', C.markPlayed(load('played', []), a.id, pool.some(x => x.id === a.id) ? pool : [a]));
+        logHeard(a);
+      }
+      if (st.stopAtEnd) { st.stopAtEnd = false; return sleepNow(); }
+      st.pos++; st.para = 0; persist();
+      if (st.pos >= st.items.length) return endPlaylist();
+      st.gapTimer = setTimeout(() => { if (st.playing) startPiece(0); }, (S.gap | 0) * 1000);
+    };
+    const src = () => { if (S.sourceLine && a && a.src === 'Original' && a.ld && a.ld.length && S.links) speak(`That concludes the lecture. Where it leads: ${a.ld.map(shortTitle).join(' and ')}.`, fin); else fin(); };
+    if (S.quiz && S.questions && a && a.q && a.q.length) startQuiz(a, src); else src();
+  }
+
+  // ---------- quiz (version 1): up to two questions after a lesson ----------
+  const LETTERS = ['A', 'B', 'C'];
+  function startQuiz(a, then) {
+    const qs = a.q.slice(0, 2).map((q, n) => ({ q, n }));
+    st.quiz = { a, qs, i: 0, then, answered: false };
+    $('quiz').hidden = false;
+    askQuiz();
+  }
+  function quizSpokenQ(q) { return q.q + ' ' + q.o.map((o, k) => `${LETTERS[k]}: ${o}.`).join(' '); }
+  function askQuiz() {
+    const z = st.quiz; if (!z) return;
+    if (z.i >= z.qs.length) return endQuiz();
+    const { q } = z.qs[z.i]; z.answered = false;
+    $('h-quiz').textContent = `Quick quiz, question ${z.i + 1} of ${z.qs.length}`;
+    $('quiz-q').textContent = q.q;
+    const ul = $('quiz-opts'); ul.innerHTML = '';
+    q.o.forEach((o, k) => ul.append(el('li', {}, el('button', { text: `${LETTERS[k]}: ${o}`, onclick: () => answerQuiz(k) }))));
+    const intro = z.i === 0 ? 'Before we part, a little examination question, entirely without marks. Simply listen; the answer will follow after a pause. ' : 'And another. ';
+    speak(intro + quizSpokenQ(q), () => { if (!st.quiz || z.answered) return; z.timer = setTimeout(() => answerQuiz(-1), Math.round(S.think * 1000)); });
+  }
+  function answerQuiz(k) {
+    const z = st.quiz; if (!z || z.answered) return;
+    z.answered = true; clearTimeout(z.timer);
+    const { q, n } = z.qs[z.i];
+    const key = `${z.a.id}#${n}`, qs = load('quiz', {}); const rec = qs[key] || { right: 0, wrong: 0 };
+    let msg;
+    if (k === q.a) { rec.right++; msg = `Capital, quite right: ${LETTERS[q.a]}, ${q.o[q.a]}. ${q.ex}`; }
+    else if (k < 0) { msg = `The answer is ${LETTERS[q.a]}: ${q.o[q.a]}. ${q.ex}`; }
+    else { rec.wrong++; msg = `Not quite, but a very natural guess. The answer is ${LETTERS[q.a]}: ${q.o[q.a]}. ${q.ex} I shall bring this one back another day.`; }
+    rec.at = Date.now(); qs[key] = rec; save('quiz', qs);
+    $('quiz-q').textContent = msg;
+    stopSpeech(); speak(msg, () => { if (st.quiz !== z) return; z.i++; askQuiz(); });
+  }
+  function endQuiz() { const z = st.quiz; st.quiz = null; $('quiz').hidden = true; if (z && st.playing) z.then(); }
+  function abortQuiz() { const z = st.quiz; if (z) { clearTimeout(z.timer); st.quiz = null; $('quiz').hidden = true; } }
+
+  // ---------- recap of last session ----------
+  function recapItems() {
+    const r = C.buildRecap(load('log', []), IDX.articles, st.sessionStart, load('quiz', {}));
+    if (!r.ideas.length && !r.missed.length) return [];
+    const out = [{ say: 'Welcome back, my dear friend. First, a few words on where we had got to.' }];
+    let lastT = '';
+    r.ideas.forEach(x => { if (x.t !== lastT) { out.push({ say: `From ${x.t}:` }); lastT = x.t; } out.push({ say: x.k }); });
+    r.missed.forEach(m => {
+      if (!S.questions) return;
+      out.push({ say: 'Here is a question that gave you a little trouble before. ' + quizSpokenQ(m.q) });
+      out.push({ wait: Math.round(S.think * 1000) });
+      out.push({ say: `The answer is ${LETTERS[m.q.a]}: ${m.q.o[m.q.a]}. ${m.q.ex}` });
+    });
+    out.push({ say: 'There. Now, onward.' });
+    return out;
+  }
+
+  // a woven-in recap item becomes spoken paragraphs
+  function recapParas(it) {
+    const ideas = C.recapIdeas(IDX.articles, it.of || [it.id], 2).filter(x => x.k.length);
+    const open = it.previously ? 'Previously, my dear friend. Before we climb a little higher, let us look back at the path.' : 'A short pause on the path, my dear friend, to look back. Previously:';
+    const out = ['%% ' + open];
+    ideas.forEach(x => { out.push('%% From ' + x.t + '.'); x.k.forEach(k => out.push('%% ' + k)); });
+    out.push('%% ' + (it.previously ? 'Splendid. Now, one notch further.' : 'Good. Onward.'));
+    return out;
+  }
+  function endPlaylist() {
+    if ((S.autoContinue || S.hours === 'all') && st.playing) {
+      const ok = buildFromSettings(true);
+      if (ok) { st.pos = 0; return startPiece(0, [{ say: 'That concludes this stretch of the journey. I shall simply carry on with the next, unless you stop me.' }]); }
+    }
+    speak('That is the end of the playlist. Thank you for your company, my dear friend.', () => {}); pause(true); st.items = []; st.pos = 0; persist(); updateUI();
+  }
+  function sleepNow() {
+    st.playing = false; stopSpeech(); abortQuiz(); clearTimeout(st.gapTimer); st.sleepAt = 0; st.stopAtEnd = false;
+    speak('The sleep timer has finished. Good night, my dear friend, and sleep well.', () => {});
+    S.sleep = 'off'; saveS(); renderSleep();
+    releaseNight(); persist(); updateUI(); setNow('Paused by the sleep timer. Press Play to carry on where we stopped.');
+  }
+  async function play() {
+    if (!IDX) return;
+    unlockAudio(); primeSpeech(); ensureAudio();
+    if (!st.items.length) {
+      const r = C.decodeResume(JSON.stringify(load('resume', null)), IDX.articles);
+      if (r) { st.items = r.items; st.pos = r.pos; st.para = r.para; st.key = r.key; }
+      else if (!buildFromSettings(false)) { announce('Nothing matches your choices. Open Build a playlist and tick more categories or levels.'); return; }
+    }
+    st.playing = true; updateUI(); keepNight();
+    const intro = [];
+    if (S.plugTip && !st.tipDone) { intro.push({ say: 'A word of advice: plug the phone in, and leave Maths by Ear open with the screen on. VoiceOver\'s screen curtain will keep it dark.' }); st.tipDone = true; }
+    if (S.recap && !st.recapDone) { st.recapDone = true; recapItems().forEach(x => intro.push(x)); }
+    armSleep();
+    announce('Playing');
+    startPiece(st.para, intro);
+  }
+  function pause(silent) {
+    st.playing = false; stopSpeech(); abortQuiz(); clearTimeout(st.gapTimer); releaseNight(); persist(); updateUI();
+    if (!silent) { announce('Paused'); const a = current(); setNow(a ? `Paused: ${a.t}. I shall wait here.` : 'Paused.'); }
+  }
+  function toggle() { st.playing ? pause() : play(); }
+  function jumpPiece(d) {
+    if (!st.items.length) return;
+    const np = st.pos + d; if (np < 0 || np >= st.items.length) { announce(d > 0 ? 'This is the last piece.' : 'This is the first piece.'); return; }
+    stopSpeech(); abortQuiz(); clearTimeout(st.gapTimer); st.pos = np; st.para = 0; persist();
+    const a = current(); announce(`${d > 0 ? 'Next' : 'Previous'} piece: ${a.t}`);
+    if (st.playing) startPiece(0); else { setNow(`Ready: ${a.t}. Press Play.`); updateUI(); }
+  }
+  function jumpPara(d) {
+    if (!st.paras || !st.items.length) { announce('Nothing playing.'); return; }
+    let p = st.para + d;
+    while (p > 0 && p < st.paras.length && st.paras[p].startsWith('## ') && d < 0) p--;
+    p = Math.max(0, Math.min(st.paras.length - 1, p));
+    st.para = p; st.chunk = 0; st.pitems = null; st.pre = []; persist();
+    announce(d > 0 ? 'Forward one paragraph' : 'Back one paragraph');
+    if (st.playing) { stopSpeech(); step(); }
+  }
+  function sayAgain() {
+    const items = st.lastMath; if (!items) { announce('No formula yet.'); return; }
+    const wasPlaying = st.playing && !st.quiz;
+    if (wasPlaying) { stopSpeech(); st.pre = [{ say: 'Again:' }].concat(items.map(x => Object.assign({}, x))).concat(st.pre); st.chunk = st.pitems ? Math.min(st.chunk, st.pitems.length) : 0; step(); }
+    else { ensureAudio(); primeSpeech(); stopSpeech(); runSeq([{ say: 'Again:' }].concat(items), () => {}); }
+  }
+  function whatsPlaying() {
+    const a = current();
+    if (!a) { announce('Nothing playing.'); return; }
+    const paras = st.paras || [];
+    const msg = `${st.items[st.pos] && st.items[st.pos].recap ? 'A short recap. ' : ''}${a.t}. ${catName(a.c)}, ${levelName(a.lv)}. Paragraph ${st.para + 1} of ${paras.length || '?'}. About ${C.fmtMinutes(minsLeftPiece(paras))} left in this piece. Piece ${st.pos + 1} of ${st.items.length}, about ${C.fmtMinutes(playlistLeft() + minsLeftPiece(paras))} left in the playlist.${st.sleepAt ? ' Sleep timer: ' + C.fmtMinutes((st.sleepAt - Date.now()) / 60000) + ' left.' : ''}`;
+    setNow(msg);
+    if (st.playing && !st.quiz) { stopSpeech(); st.pre = [{ say: msg }].concat(st.pre); step(); }
+    else announce(msg);
+  }
+  function likeThis(more) {
+    const a = current(); if (!a) { announce('Nothing playing.'); return; }
+    save('weights', C.adjustWeights(load('weights', null), a, more));
+    if (more) announce(`Noted. More ${catName(a.c)} in random playlists from now on.`);
+    else { announce(`Noted. Less ${catName(a.c)} in random playlists. Skipping to the next piece.`); jumpPiece(1); }
+  }
+  function toggleFav() {
+    const a = current(); if (!a) { announce('Nothing playing.'); return; }
+    let f = load('favs', []);
+    if (f.includes(a.id)) { f = f.filter(x => x !== a.id); announce(`Removed ${a.t} from favourites.`); } else { f.push(a.id); announce(`Added ${a.t} to favourites.`); }
+    save('favs', f); updateUI(); renderBrowse();
+  }
+  function armSleep() {
+    st.stopAtEnd = S.sleep === 'end'; st.sleepAt = 0;
+    const m = parseFloat(S.sleep); if (m > 0) st.sleepAt = Date.now() + m * 60000;
+  }
+
+  // ---------- overnight: wake lock, keep-alive, media session ----------
+  async function keepNight() {
+    if (S.wakeLock && 'wakeLock' in navigator && !st.wake) { try { st.wake = await navigator.wakeLock.request('screen'); st.wake.addEventListener('release', () => { st.wake = null; }); } catch (e) { st.wake = null; } }
+    if (S.keepAlive) startKeepAlive();
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+  }
+  function releaseNight() {
+    if (st.wake) { try { st.wake.release(); } catch (e) {} st.wake = null; }
+    stopKeepAlive();
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && st.playing) { keepNight(); if (actx && actx.state !== 'running') actx.resume().catch(() => {}); if (!st.quiz && synth() && !synth().speaking && st.utter) { stopSpeech(); step(); } } });
+  let ka = null;
+  function quietWavUrl() {
+    const n = 16000, buf = new ArrayBuffer(44 + n * 2), d = new DataView(buf);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) d.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); d.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 1, true);
+    d.setUint32(24, 8000, true); d.setUint32(28, 16000, true); d.setUint16(32, 2, true); d.setUint16(34, 16, true); w(36, 'data'); d.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) d.setInt16(44 + i * 2, (C.randInt(7) - 3), true);
+    return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  }
+  function unlockAudio() { if (S.keepAlive && !ka) { ka = new Audio(quietWavUrl()); ka.loop = true; ka.volume = 0.05; ka.setAttribute('aria-hidden', 'true'); } }
+  function startKeepAlive() { unlockAudio(); if (ka) ka.play().catch(() => {}); }
+  function stopKeepAlive() { if (ka) { try { ka.pause(); } catch (e) {} } }
+  function mediaMeta(a) { if (!('mediaSession' in navigator)) return; try { navigator.mediaSession.metadata = new MediaMetadata({ title: a.t, artist: catName(a.c), album: 'Maths by Ear 2: Professor Pennyfeather' }); } catch (e) {} }
+  function mediaHandlers() {
+    if (!('mediaSession' in navigator)) return;
+    const h = { play: () => play(), pause: () => pause(), nexttrack: () => jumpPiece(1), previoustrack: () => jumpPiece(-1), seekforward: () => jumpPara(1), seekbackward: () => jumpPara(-1), stop: () => pause() };
+    for (const k in h) { try { navigator.mediaSession.setActionHandler(k, h[k]); } catch (e) {} }
+  }
+
+  // ---------- building playlists ----------
+  const allCats = () => CATS.map(c => c[0]);
+  const allLevels = () => LEVELS.map(l => String(l[0]));
+  function selFromSettings() { return { mode: S.mode, one: S.one, cats: S.cats || allCats(), levels: S.levels || allLevels(), length: S.length, favourites: load('favs', []), basics: S.basics, replaced: IDX ? IDX.articles.filter(a => a.tier === 'refresher').map(a => a.rep) : [] }; }
+  const ORDERED_V2 = ['course', 'thread', 'scarier'];
+  function buildFromSettings(quiet, extra) {
+    const sel = selFromSettings(), minutes = S.hours === 'all' ? Infinity : parseFloat(S.hours) * 60;
+    const played = load('played', []), weights = load('weights', null);
+    const ordered = S.mode === 'category' || S.mode === 'lessons';
+    let r;
+    if (S.mode === 'course') r = C.buildCourse(IDX.articles, Object.assign({ pace: S.pace, basics: S.basics, played, minutes: minutes === Infinity ? 24 * 60 : minutes }, extra || {}));
+    else if (S.mode === 'thread') r = C.buildThread(IDX.articles, S.thread, { pace: S.pace, basics: S.basics, played, minutes: minutes === Infinity ? 24 * 60 : minutes });
+    else if (S.mode === 'scarier') r = C.buildScarier(IDX.articles, load('log', []), { basics: S.basics, played, minutes: minutes === Infinity ? 24 * 60 : Math.min(minutes, 40 * 60) });
+    else r = ordered ? C.buildOrdered(IDX.articles, sel, { minutes, played, catOrder: allCats() }) : C.buildPlaylist(IDX.articles, sel, { minutes, played, weights });
+    if (!r.ids.length) { $('buildsummary').textContent = 'Nothing matches these choices. Tick more categories or levels.'; return false; }
+    st.items = r.items ? r.items.map(x => Object.assign({}, x)) : r.ids.map(id => ({ id })); st.pos = 0; st.para = 0; st.key = S.mode === 'course' ? 'course' : C.selectionKey(sel); persist();
+    const first = art(r.ids[0]);
+    const desc = S.mode === 'course' ? `The Grand Course, at ${S.pace === 'day' ? 'Day pace' : 'Night pace'}, starting with ${first.t}.` : S.mode === 'thread' ? `The ${threadName(S.thread)} thread, starting with ${first.t}.` : S.mode === 'scarier' ? `Slightly scarier than last week, starting with ${st.items[0].recap ? 'a short recap of what you heard recently' : first.t}.` : ordered ? 'In course order, starting with ' + first.t + '.' : 'In random order.';
+    const msg = `Playlist ready: ${st.items.length} pieces, about ${C.fmtMinutes(r.minutes)}. ${desc}${r.cycleReset ? ' You had heard everything here, so we begin again.' : ''}${S.hours === 'all' ? ' It will carry on until you stop it.' : ''}`;
+    $('buildsummary').textContent = msg; if (!quiet) announce(msg); updateUI();
+    return true;
+  }
+  function selectionSummary() {
+    const pool = C.filterArticles(IDX.articles, selFromSettings());
+    const m = pool.reduce((n, a) => n + a.m, 0);
+    $('buildsummary').textContent = `Your choices match ${pool.length} pieces, about ${C.fmtMinutes(m)} in all.`;
+  }
+
+  // ---------- views ----------
+  let lastView = 'player';
+  function show(v) {
+    document.querySelectorAll('main > section').forEach(s => { s.hidden = s.id !== 'v-' + v; });
+    if (v !== 'read') lastView = v;
+    const h = document.querySelector('#v-' + v + ' h2'); if (h) h.focus();
+    window.scrollTo(0, 0);
+  }
+  function renderSleep() {
+    radios($('f-sleep'), 'sleep', [['off', 'Off'], ['30', '30 minutes'], ['60', '1 hour'], ['120', '2 hours'], ['240', '4 hours'], ['480', '8 hours'], ['end', 'At the end of this piece']], S.sleep, v => { S.sleep = v; saveS(); armSleep(); announce(v === 'off' ? 'Sleep timer off' : 'Sleep timer set'); });
+  }
+  const MODES = [['course', 'The Grand Course: every lecture in order from counting to calculus, with readings between, carrying on where you left off'], ['thread', 'One thread: number, algebra, geometry, functions, calculus and more, in order'], ['scarier', 'Slightly scarier than last week: one notch beyond what you heard in the last seven days'], ['lessons', "Lectures only: the Professor's own scripts, in course order"], ['category', 'One category, in course order'], ['shuffle', 'Random: a shuffle of everything ticked'], ['favourites', 'My favourites']];
+  const threadName = t => { const x = (IDX.threads || []).find(r => r[0] === t); return x ? x[1] : t; };
+  function renderBuild() {
+    radios($('f-mode'), 'mode', MODES, S.mode, v => { S.mode = v; saveS(); selectionSummary(); });
+    radios($('f-one'), 'one', CATS, S.one, v => { S.one = v; saveS(); selectionSummary(); });
+    radios($('f-thread'), 'thread', IDX.threads || [], S.thread, v => { S.thread = v; saveS(); });
+    checks($('f-cats'), 'cat', CATS, S.cats || allCats(), (v, on) => { const l = new Set(S.cats || allCats()); on ? l.add(v) : l.delete(v); S.cats = [...l]; saveS(); selectionSummary(); });
+    checks($('f-levels'), 'lv', LEVELS.map(l => [String(l[0]), l[1]]), S.levels || allLevels(), (v, on) => { const l = new Set(S.levels || allLevels()); on ? l.add(v) : l.delete(v); S.levels = [...l]; saveS(); selectionSummary(); });
+    radios($('f-hours'), 'hours', [['1', '1 hour'], ['2', '2 hours'], ['10', '10 hours'], ['20', '20 hours'], ['30', '30 hours'], ['40', '40 hours'], ['all', 'Until I stop: carries on for ever']], S.hours, v => { S.hours = v; saveS(); });
+    radios($('f-length'), 'length', [['any', 'Any length'], ['short', 'Shorter pieces only, up to 20 minutes'], ['long', 'Prefer longer pieces']], S.length, v => { S.length = v; saveS(); selectionSummary(); });
+    selectionSummary();
+  }
+  const SHELVES = [
+    ['The Grand Course', 'Every lecture in order from counting to calculus, with readings between, carrying on where you left off', { mode: 'course' }],
+    ['Slightly scarier than last week', 'One notch beyond what you heard in the last seven days, with recaps of what came before', { mode: 'scarier' }],
+    ['Easy study: base camp', 'The number lectures from the very start, gently, with readings', { mode: 'thread', thread: 'number' }],
+    ['Easy study: Brackets and Braces, a primer', 'Ten short lectures in order, then the brackets readings', { mode: 'category', one: 'brackets' }],
+    ['Easy study: stories by the fire', 'History, philosophy and big ideas, hardly a number in sight', { mode: 'shuffle', cats: ['history', 'philosophy', 'bigideas'], levels: ['1', '2'] }],
+    ['Lectures only', "All the Professor's own lectures, in course order", { mode: 'lessons', cats: null, levels: null }],
+    ['Everything at random', 'The whole library, shuffled', { mode: 'shuffle', cats: null, levels: null }]
+  ];
+  function shelfSel(preset) { return Object.assign({}, selFromSettings(), { cats: allCats(), levels: allLevels(), length: 'any' }, preset, { cats: preset.cats || allCats(), levels: preset.levels || allLevels(), one: preset.one || S.one }); }
+  function renderShelves() {
+    const ul = $('shelves'); ul.innerHTML = '';
+    const heading = t => ul.append(el('li', {}, el('h3', { text: t })));
+    const btn = (name, desc, preset, extra) => ul.append(el('li', {}, el('button', { onclick: () => useShelf(name, preset), text: `${name}. ${desc}.${extra || ''}` })));
+    const count = preset => { const pool = ORDERED_V2.includes(preset.mode) ? (preset.mode === 'thread' ? IDX.articles.filter(a => a.th === preset.thread) : IDX.articles) : C.filterArticles(IDX.articles, shelfSel(preset)); return ` ${pool.length} pieces, about ${C.fmtMinutes(pool.reduce((n, a) => n + a.m, 0))}.`; };
+    heading('The main journeys');
+    SHELVES.slice(0, 2).forEach(([n, d, p]) => btn(n, d, p));
+    heading('Easy study');
+    SHELVES.slice(2, 5).forEach(([n, d, p]) => btn(n, d, p, count(p)));
+    heading('Threads: one subject at a time, in order');
+    (IDX.threads || []).forEach(([t, lab]) => btn(lab, 'This thread in order, lectures and readings', { mode: 'thread', thread: t }, count({ mode: 'thread', thread: t })));
+    heading('Other shelves');
+    SHELVES.slice(5).forEach(([n, d, p]) => btn(n, d, p, count(p)));
+    CATS.forEach(([c, lab]) => btn(lab, 'This category in course order', { mode: 'category', one: c }, count({ mode: 'category', one: c })));
+  }
+  function useShelf(name, preset) {
+    Object.assign(S, { cats: null, levels: null, length: 'any' }, preset); if (preset.one) S.one = preset.one; if (preset.thread) S.thread = preset.thread; saveS(); renderBuild();
+    pause(true); st.items = []; ensureAudio(); primeSpeech();
+    if (buildFromSettings(true)) { announce(`${name}. Playing.`); show('player'); play(); }
+  }
+  function renderBrowse() {
+    const box = $('browse'); box.innerHTML = '';
+    const favs = load('favs', []);
+    const mk = a => el('li', {}, el('p', { text: `${a.t}. ${a.src === 'Original' ? (a.tier === 'refresher' ? 'Refresher lecture' : 'Lecture') : a.src}. About ${C.fmtMinutes(a.m)}${a.nf ? `, ${a.nf} formula${a.nf === 1 ? '' : 's'}` : ''}.` }),
+      el('div', { class: 'row' }, el('button', { 'aria-label': 'Play ' + a.t, text: 'Play', onclick: () => playOne(a.id) }), el('button', { 'aria-label': 'Read ' + a.t, text: 'Read', onclick: () => readOne(a.id) }),
+        a.src === 'Original' ? el('button', { 'aria-label': 'Start the Grand Course here, at ' + a.t, text: 'Start the course here', onclick: () => startCourseAt(a.id) }) : null));
+    if (favs.length) { box.append(el('h3', { text: 'My favourites' })); const ul = el('ul', { class: 'plain arts' }); favs.map(art).filter(Boolean).forEach(a => ul.append(mk(a))); box.append(ul); }
+    CATS.forEach(([c, lab]) => {
+      const arr = IDX.articles.filter(a => a.c === c);
+      box.append(el('h3', { text: `${lab}, ${arr.length} pieces` }));
+      LEVELS.forEach(([lv]) => {
+        const sub = arr.filter(a => String(a.lv) === String(lv)).sort((x, y) => (x.o - y.o) || x.t.localeCompare(y.t)); if (!sub.length) return;
+        box.append(el('h4', { text: `Level ${lv}, ${sub.length} pieces` }));
+        const ul = el('ul', { class: 'plain arts' }); sub.forEach(a => ul.append(mk(a))); box.append(ul);
+      });
+    });
+  }
+  function startCourseAt(id) {
+    const a = art(id); if (!a) return;
+    pause(true); ensureAudio(); primeSpeech();
+    if (a.tier === 'refresher' && S.basics !== 'refresher') { S.basics = 'refresher'; }
+    if (a.tier !== 'refresher' && a.g && S.basics === 'refresher' && IDX.articles.some(x => x.tier === 'refresher' && x.rep === a.g)) { S.basics = 'full'; }
+    S.mode = 'course'; saveS(); renderBuild(); renderSettings();
+    if (buildFromSettings(true, { fromId: id })) { announce(`The Grand Course, starting at ${a.t}.`); show('player'); play(); }
+  }
+  function playOne(id) {
+    pause(true); ensureAudio(); primeSpeech();
+    const ok = buildFromSettings(true);
+    const a0 = art(id);
+    const lead = a0 && a0.series ? IDX.articles.filter(x => x.series === a0.series && x.part >= a0.part).sort((x, y) => x.part - y.part).map(x => x.id) : [id];
+    const rest = ok ? st.items.filter(x => !lead.includes(x.id)) : [];
+    st.items = lead.map(x => ({ id: x })).concat(rest); st.pos = 0; st.para = 0; persist();
+    show('player'); play();
+  }
+  let readingId = null;
+  async function readOne(id) {
+    readingId = id; const a = art(id);
+    $('h-read').textContent = a.t;
+    $('readmeta').textContent = `${catName(a.c)}. ${levelName(a.lv)}. ${a.src === 'Original' ? 'A lecture by Professor Pennyfeather, written for Maths by Ear' : a.src === 'Wikipedia' ? 'Adapted for listening from Wikipedia' : 'From Project Gutenberg'}. About ${C.fmtMinutes(a.m)}.`;
+    const box = $('reader'); box.innerHTML = ''; box.append(el('p', { text: 'Loading…' }));
+    show('read');
+    try {
+      const paras = await textOf(id); box.innerHTML = '';
+      if (a.src === 'Original' && ((a.b && a.b.length) || (a.ld && a.ld.length))) {
+        box.append(el('h3', { text: 'Where this lecture sits' }));
+        const ul = el('ul');
+        (a.b || []).forEach(x => art(x) && ul.append(el('li', {}, 'Builds on: ', el('button', { text: art(x).t, onclick: () => readOne(x) }))));
+        (a.ld || []).forEach(x => art(x) && ul.append(el('li', {}, 'Leads to: ', el('button', { text: art(x).t, onclick: () => readOne(x) }))));
+        (a.reps || []).length && ul.append(el('li', { text: 'A refresher: it covers, briskly, ' + a.reps.map(x => art(x) ? art(x).t : x).join('; ') + '.' }));
+        box.append(ul);
+      }
+      if (a.src === 'Original' && a.k && a.k.length) { box.append(el('h3', { text: 'Key ideas' })); const ul = el('ul'); a.k.forEach(k => ul.append(el('li', { text: k }))); box.append(ul); box.append(el('h3', { text: 'The lesson' })); }
+      paras.forEach(p => {
+        if (p.startsWith('## ')) box.append(el('h4', { text: p.slice(3) }));
+        else if (p.startsWith('%% ')) box.append(el('p', { text: p.slice(3) }));
+        else if (p.startsWith('$$ ')) box.append(el('p', { class: 'formula', text: 'Formula. ' + M.paragraphReadable(p) }));
+        else if (p.startsWith('?? ')) box.append(el('p', { text: 'A question: ' + M.paragraphReadable(p.slice(3)) }));
+        else if (p.startsWith('=> ')) box.append(el('p', { text: 'Answer: ' + M.paragraphReadable(p.slice(3)) }));
+        else box.append(el('p', { text: M.paragraphReadable(p) }));
+      });
+      if (a.q && a.q.length) { box.append(el('h3', { text: 'Examination question, without marks' })); const ol = el('ol'); a.q.forEach(q => ol.append(el('li', { text: `${q.q} ${q.o.map((o, k) => LETTERS[k] + ': ' + o).join('. ')}. Answer: ${LETTERS[q.a]}. ${q.ex}` }))); box.append(ol); }
+      if (a.url) box.append(el('p', {}, 'Source: ', el('a', { href: a.url, text: `${a.src}: ${a.t}` }), a.src === 'Wikipedia' ? ', by Wikipedia contributors, adapted for listening. Licence: ' : '. Licence: ', el('a', { href: a.licUrl, text: a.lic }), '.'));
+      else box.append(el('p', { text: 'An original lecture written for Maths by Ear. Professor Pennyfeather is a fictional character; the history he tells is real.' }));
+    } catch (e) { box.innerHTML = ''; box.append(el('p', { text: 'Could not load this piece. Check the internet connection.' })); }
+  }
+  function renderCredits() {
+    const ul = $('credits'); ul.innerHTML = '';
+    IDX.articles.filter(a => a.src !== 'Original').sort((x, y) => x.t.localeCompare(y.t)).forEach(a => ul.append(el('li', {}, el('a', { href: a.url, text: a.t }), a.src === 'Wikipedia' ? (a.retold ? `. Retold in his own words by Professor Pennyfeather from the Wikipedia article by Wikipedia contributors${a.rev ? ', revision ' + a.rev : ''}. Licence of the retelling: ` : `. Wikipedia, by Wikipedia contributors${a.rev ? ', revision ' + a.rev : ''}. Kept in Wikipedia's words, adapted for listening: formulas rewritten as speech${a.cut ? ', shortened' : ''}. Licence: `) : `. ${a.src}, by ${a.by}${a.retold ? ', retold in his own words by Professor Pennyfeather' : ''}. Licence: `, el('a', { href: a.licUrl, text: a.lic }), '.')));
+    ul.prepend(el('li', { text: `${IDX.articles.filter(a => a.src === 'Original').length} original lectures, written for Maths by Ear in the voice of Professor Pennyfeather, a fictional character.` }));
+  }
+  // ---------- sound gallery ----------
+  function demo(items) { if (st.playing) pause(true); ensureAudio(); primeSpeech(); stopSpeech(); runSeq(items, () => {}); }
+  function renderSounds() {
+    const ul = $('sounds'); ul.innerHTML = '';
+    Object.keys(M.EARCONS).forEach(k => { const e = M.EARCONS[k]; ul.append(el('li', {}, el('button', { text: `Play: ${e.name}`, onclick: () => demo([{ say: e.name + '.' }, { wait: 250 }, { tone: k }]) }))); });
+    const dl = $('depths'); dl.innerHTML = '';
+    [['round', 'Round brackets'], ['square', 'Square brackets'], ['curly', 'Curly braces']].forEach(([b, lab]) => dl.append(el('li', {}, el('button', { text: `${lab} at depths 0 to 3, opening then closing`, onclick: () => demo([{ say: `${lab}, getting deeper.` }].concat([0, 1, 2, 3].map(d => ({ tone: b + '-open', depth: d }))).concat([3, 2, 1, 0].map(d => ({ tone: b + '-close', depth: d })))) }))));
+    const ex = $('soundex'); ex.innerHTML = '';
+    ['2\\times(3+4)', '\\{x : x > 0\\}', '[0, 1)', '3[2(x+1)-4]', '\\frac{x+1}{2}', 'x^{n+1}', '\\sqrt{a^2+b^2}', '\\{2[3(4+1)]\\}'].forEach(l => {
+      ex.append(el('li', {}, el('button', { text: `Play: ${M.writtenForm(l)}, said ${M.speakText(l)}`, onclick: () => demo(mergeSays(M.speak(l, mathOpts())).map(e => e.say != null ? Object.assign(e, { math: true }) : e)) })));
+    });
+  }
+  // ---------- settings ----------
+  function slider(id, key, text, after) {
+    const r = $(id); r.value = S[key];
+    const vt = () => r.setAttribute('aria-valuetext', text(S[key]));
+    vt(); r.oninput = () => { S[key] = parseFloat(r.value); vt(); saveS(); after && after(); };
+  }
+  function renderSettings() {
+    refreshVoices();
+    slider('s-rate', 'rate', v => `${Math.round(v * 100)} percent${v < 1 ? ', slower than normal' : v > 1 ? ', faster than normal' : ', normal'}`);
+    slider('s-mathrate', 'mathRate', v => v >= 1 ? 'Same speed as the rest' : `${Math.round(v * 100)} percent of the speaking speed`);
+    slider('s-think', 'think', v => `${v} seconds`);
+    $('s-rate').value = S.rate; $('s-think').value = S.think;
+    slider('s-vol', 'toneVol', v => `${Math.round(v * 100)} percent`);
+    radios($('f-pace'), 'pace', [['night', 'Night: slow and gentle, longer pauses, more recaps, lighter readings'], ['day', 'Day: brisker, shorter pauses, fewer recaps, denser readings']], S.pace, v => { const P = C.PACE[v]; S.pace = v; S.rate = P.rate; S.think = P.think; saveS(); renderSettings(); announce(v === 'day' ? 'Day pace. Brisk work, my dear friend.' : 'Night pace. Gently does it.'); });
+    radios($('f-basics'), 'basics', [['full', 'Full lectures for the basics'], ['refresher', 'Refresher lectures: the basics briskly, one lecture per stretch']], S.basics, v => { S.basics = v; saveS(); });
+    radios($('f-questions'), 'questions', [['on', 'On: questions, a pause, then the answer'], ['off', 'Off: no questions at all, just the lectures']], S.questions ? 'on' : 'off', v => { S.questions = v === 'on'; saveS(); });
+    radios($('f-struct'), 'struct', [['brackets', 'Bracket tones only, the word bracket is never said; everything else in words (recommended)'], ['both', 'Tones and words for brackets'], ['words', 'Words only, no tones'], ['tones', 'Tones only, for brackets, fractions, powers and roots']], S.structure, v => { S.structure = v; saveS(); renderSounds(); });
+    radios($('f-depth'), 'depth', [['pitch', 'Pitch: deeper brackets sound higher'], ['stereo', 'Stereo: deeper brackets move left and right, best with headphones'], ['both', 'Pitch and stereo']], S.depthBy, v => { S.depthBy = v; saveS(); });
+    radios($('f-frac'), 'frac', [['full', 'Full: the fraction, numerator, over, denominator, end fraction'], ['short', 'Shorter: fraction, x plus 1, over 2, end fraction']], S.fracStyle, v => { S.fracStyle = v; saveS(); renderSounds(); });
+    const box = $('f-toggles'); box.querySelectorAll('label').forEach(x => x.remove());
+    [['structTones', 'Tones for fractions, powers and roots'], ['thinkTones', 'Tones at the start and end of a question pause'], ['quiz', 'Examination question at the end of a lecture, spoken, with the answer after a pause'], ['recap', 'Recap of last time when I press Play'], ['links', 'Say what each lecture builds on and where it leads'], ['titles', 'Say the category, level and title before each piece'], ['headings', 'Read section headings'], ['sourceLine', 'Say the source at the end of adapted pieces'], ['plugTip', 'Remind me to plug the phone in'], ['announcePieces', 'VoiceOver also announces each new piece (it may talk over the reading)'], ['autoContinue', 'When a playlist ends, carry straight on with the next']].forEach(([k, lab]) => {
+      const i = el('input', { type: 'checkbox' }); i.checked = !!S[k]; i.addEventListener('change', () => { S[k] = i.checked; saveS(); }); box.append(el('label', {}, i, lab));
+    });
+    radios($('f-gap'), 'gap', [['0', 'No pause'], ['2', '2 seconds'], ['5', '5 seconds'], ['10', '10 seconds']], S.gap, v => { S.gap = parseInt(v, 10); saveS(); });
+    const nb = $('f-night'); nb.querySelectorAll('label').forEach(x => x.remove());
+    [['wakeLock', 'Keep the screen awake while playing'], ['keepAlive', 'Experimental: play a near-silent sound in the background, which may help the iPhone keep the app running']].forEach(([k, lab]) => {
+      const i = el('input', { type: 'checkbox' }); i.checked = !!S[k]; i.addEventListener('change', () => { S[k] = i.checked; saveS(); if (k === 'keepAlive' && !i.checked) stopKeepAlive(); }); nb.append(el('label', {}, i, lab));
+    });
+  }
+  // ---------- teaching and help text ----------
+  function renderText(id, blocks) {
+    const box = $(id); box.innerHTML = '';
+    blocks.forEach(b => {
+      if (b[0] === 'h') box.append(el('h3', { text: b[1] }));
+      else if (b[0] === 'p') box.append(el('p', { text: b[1] }));
+      else if (b[0] === 'ul') { const ul = el('ul'); b[1].forEach(x => ul.append(Array.isArray(x) ? el('li', {}, x[0] + ' ', el('a', { href: x[1], text: x[2] || 'Source' })) : el('li', { text: x }))); box.append(ul); }
+    });
+  }
+  const TEACH = [["h", "About the Professor"], ["p", "Professor Ambrose Pennyfeather is a fictional character, invented for Maths by Ear. In version 3, as much of the library as he could manage is retold in his own words, from Wikipedia articles and from Flatland, with the facts kept and the sources credited. He was not a real person, and his housekeeper, his cat and his college are invented too. The mathematicians he talks about, and the history he tells, are real, and checked; where a story is only a legend, he says so."], ["p", "In his own words: I was born in Bristol in 1829, the son of a ship's chandler, and I learnt to count by tallying coils of rope on the quay. A scholarship took me to Cambridge, where in 1851 I graduated Fourteenth Wrangler. Fourteen, as I never tire of pointing out, is twice seven, and seven is a most respectable prime. For twenty years I taught evening classes at a Mechanics' Institute in Manchester, where I learnt that people who had been told they were no good at figures were nearly always merely untaught. I now profess mathematics at St Swithin's College, London, and live in Bloomsbury with Euclid, a large ginger cat, Mrs Blewitt, my housekeeper, who adds up the grocer's bill faster than I can find my pencil, and two umbrellas, named Newton and Leibniz."], ["p", "By some contrivance I do not pretend to understand, my lectures reach you through the little glass slate in your pocket, and I have been given a reading ticket to the library of the future. That is how I can tell you about Gödel, computers and Wikipedia without pretending I lived to see them."], ["h", "How these lectures teach, and why"], ["p", "Allow me to explain my methods, my dear friend, for they are not whims. They rest on research into how blind and partially sighted people learn mathematics, how mathematics is best spoken aloud, and how anyone learns it well. The sources are at the end."], ["h", "1. Formulas said the same way every time"], ["p", "Maths read aloud carelessly loses its shape: \"x plus 1 over 2\" could mean two different things. Speech styles called ClearSpeak and MathSpeak were designed for screen readers to cure this. A 2025 study comparing speech styles found that listeners understood more when the edges of fractions, roots and brackets were announced."], ["p", "What I do: simple things stay simple, such as one half, x squared, 2 over 3. Complicated things get clear edges: the fraction, numerator, x plus 1, over, denominator, 2, end fraction. Every bracket is named as it opens and closes. Formulas are said a little more slowly than the rest."], ["h", "2. Sounds that show structure"], ["p", "Robert Stevens and Alistair Edwards, in Britain, built MathTalk, a system for blind readers of algebra. They found that short sounds, called earcons, and changes of rhythm and pitch help a listener grasp the shape of an expression and spare the memory."], ["p", "What I do: each kind of bracket has its own sound. Round brackets are a soft low note, square brackets a brighter middle note, curly braces a high chime, all a good deal louder than in earlier versions, and I never say the word bracket aloud. Opening sounds rise; closing sounds fall. Brackets inside brackets sound higher, or move left and right in stereo. Every tone is made by the browser itself as it plays; there are no recorded sound files at all."], ["h", "3. One idea at a time"], ["p", "Listening to mathematics uses working memory heavily, because you cannot glance back at the page. Process-Driven Math, developed for blind college students, breaks problems into small named pieces, one layer at a time. Reviews of digital maths learning for students with severe visual impairment agree: audio works best when it is structured, repeatable and controllable."], ["p", "What I do: each lecture builds one idea at a time, with a summary at the end. You may hear the last formula again as often as you like, or go back a paragraph."], ["h", "4. Concrete first, then words, then symbols"], ["p", "Teachers of blind students recommend moving from the concrete, through a representation, to the abstract, and describing things precisely in words, never by pointing at a picture. The Concrete, Representational, Abstract sequence is among the best supported methods in all maths teaching."], ["p", "What I do: I begin with parcels, balance scales, cartwheels, shadows and cab fares before the symbols, and describe graphs and shapes with directions and distances."], ["h", "5. Worked examples"], ["p", "Studying worked examples, especially early on, helps more than solving problems cold. A 2023 meta-analysis found a moderate benefit, an effect size of about 0.48."], ["p", "What I do: I work every example aloud, step by step, before asking anything of you."], ["h", "6. Pause and think, then hear the answer"], ["p", "Trying to recall or predict an answer, even wrongly, makes learning stick. This is called retrieval practice, and it is one of the most reliable findings in learning science."], ["p", "What I do: I ask a question, pour the tea while you think, and then give the answer, all without your touching anything. The pause is about 10 seconds in Night pace and 7 in Day pace, and you can change it or turn questions off entirely."], ["h", "7. Coming back, and mixing"], ["p", "Returning to ideas after a gap, called spacing, and mixing different kinds of problem, called interleaving, both improve long-term learning in mathematics."], ["p", "What I do: the course weaves in short \"previously\" recaps of earlier lectures, more of them at Night pace. The Slightly scarier playlist brings back what you heard recently and then goes one notch further. Refresher lectures let you revisit a whole stretch in one sitting."], ["h", "8. Maths anxiety is real"], ["p", "Worry about mathematics takes up working memory that would otherwise go on the mathematics. Research by Ashcraft and others shows anxious people perform worse because of this, not because they are less able. A gentle start, stories and early success all help."], ["p", "What I do: I never mock, keep no marks, time nothing, and remind you that the greatest mathematicians found these things hard too. My Aunt Hester never forgave negative numbers, and she kept excellent accounts all the same."], ["h", "What these lectures cannot do"], ["ul", ["The plain-words notes after Wikipedia formulas are made automatically and are general; the careful teaching is in my own lectures.", "Some Wikipedia passages refer to figures that are not there.", "Tactile materials, such as raised diagrams, help many blind learners. An audio app cannot replace them.", "I am a character in a computer program. I cannot hear your answers, only give you time to think of them."]], ["h", "Sources"], ["ul", [["MathCAT speech rules, including ClearSpeak and MathSpeak styles.", "https://docs.rs/crate/mathcat/latest/source/Rules/Languages/en/ClearSpeak_Rules.yaml", "MathCAT ClearSpeak rules"], ["Robles (2025). A comparison of different styles of speech for mathematics. California State University, Northridge.", "https://scholarworks.calstate.edu/downloads/5t34sv64c", "CSUN ScholarWorks"], ["Stevens and Edwards. Design and evaluation of an auditory glance at algebra for blind readers. University of Manchester.", "https://research.manchester.ac.uk/en/publications/design-and-evaluation-of-an-auditory-glance-at-algebra-for-blind-/", "Manchester Research Explorer"], ["Stevens and Edwards. Mathtalk: usable access to mathematics. Information Technology and Disabilities.", "http://itd.athenpro.org/volume1/number4/article5.html", "ITD Journal"], ["Gulley, Smith, Price, Prickett and Ragland (2017). Process-Driven Math: an auditory method of mathematics instruction and assessment for students who are blind or have low vision. Journal of Visual Impairment and Blindness.", "https://eric.ed.gov/?id=EJ1156239", "ERIC EJ1156239"], ["Klingenberg and colleagues (2019). A systematic review of digital learning in mathematics for students with severe visual impairment. British Journal of Visual Impairment.", "https://doi.org/10.1177/0264619619876975", "doi 10.1177/0264619619876975"], ["Leuders (2016). Tactile and acoustic teaching material in inclusive mathematics classrooms. British Journal of Visual Impairment.", "https://doi.org/10.1177/0264619615610160", "doi 10.1177/0264619615610160"], ["Perkins School for the Blind (Paths to Literacy and resources): Visualizing math, a multisensory approach.", "https://www.perkins.org/resource/visualizing-math-considerations-for-students-with-cvi/", "Perkins"], ["Barbieri, Clerjuste and Chawla (2023). A meta-analysis of the worked examples effect on mathematics performance. Educational Psychology Review.", "https://doi.org/10.1007/s10648-023-09745-1", "doi 10.1007/s10648-023-09745-1"], ["Dunlosky, Rawson, Marsh, Nathan and Willingham (2013). Improving students' learning with effective learning techniques. Psychological Science in the Public Interest.", "https://doi.org/10.1177/1529100612453266", "doi 10.1177/1529100612453266"], ["Rohrer, Dedrick, Hartwig and Cheung (2020). A randomized controlled trial of interleaved mathematics practice. Journal of Educational Psychology.", "https://doi.org/10.1037/edu0000367", "doi 10.1037/edu0000367"], ["Meta-analysis of spacing and retrieval practice in mathematics learning (2025). Educational Psychology Review.", "https://doi.org/10.1007/s10648-025-10035-1", "doi 10.1007/s10648-025-10035-1"], ["Ashcraft and Kirk (2001). The relationships among working memory, math anxiety, and performance. Journal of Experimental Psychology: General.", "https://doi.org/10.1037/0096-3445.130.2.224", "doi 10.1037/0096-3445.130.2.224"], ["Dowker, Sarkar and Looi (2016). Mathematics anxiety: what have we learned in 60 years? Frontiers in Psychology.", "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4842756/", "PMC4842756"]]]];
+  const HELP = [
+    ['h', 'Starting: press Play once'], ['p', 'Press Play near the top, and I shall begin the Grand Course: every lecture in order, from counting to calculus, with readings between. You need never touch the phone again. Questions are asked aloud, I pause while you think, and then I give the answer. When a playlist ends I simply carry on. If you close the browser, press Play next time and we resume exactly where we stopped.'],
+    ['h', 'How long'], ['p', 'In Build a playlist, choose 10, 20, 30 or 40 hours, or Until I stop. The whole library is about a hundred hours.'],
+    ['h', 'Night pace and Day pace'], ['p', 'In Voice and settings. Night pace is slow and gentle: I speak more slowly, pause about 10 seconds for questions, recap every two lectures, and choose lighter readings between them. Day pace is brisker: quicker speech, pauses of about 7 seconds, fewer recaps, and readings on the same subject. You may still change the speed and the pause by hand afterwards.'],
+    ['h', 'Questions on or off'], ['p', 'Also in Voice and settings. With questions off, I skip every question, answer and examination question, and simply lecture.'],
+    ['h', 'Jumping about'], ['p', 'In Browse all pieces, every one of my lectures has a button called Start the course here. Press it and the Grand Course begins from that lecture and carries on from there. Next piece and Previous piece skip forwards and back. Basics: in Voice and settings you may choose Refresher lectures, which cover each stretch of base camp, the brackets and the first algebra briskly in one lecture instead of several.'],
+    ['h', 'Threads and easy study'], ['p', 'Shelves offers easy study playlists, threads that follow one subject in order, number, algebra, geometry, functions, calculus, chance, logic and stories, and the Slightly scarier playlist, which looks at what you heard in the last seven days, recaps it under the heading Previously, and then goes one notch further.'],
+    ['h', 'Hearing formulas'], ['p', 'Formulas are said in words, a little more slowly than the rest, but I never say the word bracket. Each kind of bracket has its own clear tone instead: round brackets a soft low note, square brackets a brighter middle note, curly braces a high chime. An opening tone rises and a closing tone falls, like a lid lifted and put back; a bracket inside another sounds a little higher. Powers are always said in words: squared, cubed, to the power of 50. Lecture three of the Grand Course, The tone tutorial, plays and names every tone with practice formulas, and the Sound gallery lets you hear them whenever you please. Say the last formula again repeats the latest formula as often as you like.'],
+    ['h', 'Overnight'], ['p', 'Plug the phone in. While playing, the app keeps the screen awake, so leave it open and do not lock the phone. VoiceOver screen curtain, a triple tap with three fingers, darkens the screen. If the iPhone stops the voice, open Maths by Ear again and press Play. If you hear speech but no tones, check that the volume is up; on some versions of iOS the ring switch silences tones.'],
+    ['h', 'Lock screen and headphones'], ['p', 'Play, pause, next and previous on the lock screen or on headphones work while the page is open.'],
+    ['h', 'Reading with VoiceOver'], ['p', 'In Browse, Read shows a piece as text under headings, with what it builds on and where it leads. Each formula is written out and then given in words.'],
+    ['p', 'Keyboard: Space plays or pauses, N next piece, P previous, left and right arrows move a paragraph, A says the last formula again.']
+  ];
+
+
+  // ---------- start ----------
+  function bind() {
+    document.querySelectorAll('#menu button[data-view]').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
+    $('b-play').addEventListener('click', () => { ensureAudio(); toggle(); });
+    $('b-resume').addEventListener('click', () => play());
+    $('b-prev').addEventListener('click', () => jumpPiece(-1));
+    $('b-next').addEventListener('click', () => jumpPiece(1));
+    $('b-pback').addEventListener('click', () => jumpPara(-1));
+    $('b-pfwd').addEventListener('click', () => jumpPara(1));
+    $('b-again').addEventListener('click', sayAgain);
+    $('b-what').addEventListener('click', whatsPlaying);
+    $('b-more').addEventListener('click', () => likeThis(true));
+    $('b-less').addEventListener('click', () => likeThis(false));
+    $('b-fav').addEventListener('click', toggleFav);
+    $('b-quizreveal').addEventListener('click', () => answerQuiz(-1));
+    $('b-quizskip').addEventListener('click', () => { const z = st.quiz; if (!z) return; clearTimeout(z.timer); stopSpeech(); z.i = z.qs.length; endQuiz(); });
+    $('b-buildplay').addEventListener('click', () => { pause(true); st.items = []; ensureAudio(); primeSpeech(); if (buildFromSettings(false)) { show('player'); play(); } });
+    $('b-buildonly').addEventListener('click', () => { pause(true); buildFromSettings(false); });
+    $('b-readplay').addEventListener('click', () => readingId && playOne(readingId));
+    $('b-readback').addEventListener('click', () => show(lastView));
+    $('s-voice').addEventListener('change', e => { S.voiceURI = e.target.value; saveS(); });
+    $('b-testvoice').addEventListener('click', () => demo([{ say: 'Good evening, my dear friend. This is my lecturing voice. Here is a formula.' }].concat(mergeSays(M.paragraphEvents('⟦2\\times(3+4)=14⟧', mathOpts())).map(e => e.say != null ? Object.assign(e, { math: true }) : e))));
+    $('b-version').addEventListener('click', () => { const n = IDX ? IDX.articles.length : 0, h = IDX ? Math.round(IDX.articles.reduce((m, a) => m + a.m, 0) / 60) : 0; const msg = `Maths by Ear version ${VERSION}, with Professor Ambrose Pennyfeather, in which as much as I could manage is retold in his own words. ${n} pieces, about ${h} hours, in ${CATS.length} categories and five levels, including ${IDX ? IDX.articles.filter(a => a.src === 'Original').length : 0} of the Professor's lectures and the Brackets and Braces primer. The Professor is a fictional character.`; announce(msg); if (!st.playing) speak(msg, () => {}); });
+    $('b-clearhist').addEventListener('click', () => { save('played', []); save('log', []); announce('Done. Everything can play again, and the Grand Course starts from the beginning.'); });
+    $('b-clearquiz').addEventListener('click', () => { save('quiz', {}); announce('Examination answers forgotten. A clean slate.'); });
+    $('b-clearweights').addEventListener('click', () => { save('weights', null); announce('More like this and less like this have been reset.'); });
+    $('b-reset').addEventListener('click', () => { S = Object.assign({}, DEFAULTS); saveS(); renderSettings(); renderBuild(); renderSleep(); renderSounds(); announce('Settings reset.'); });
+    $('b-offline').addEventListener('click', async () => {
+      announce('Saving all pieces. Please wait.');
+      try { await Promise.all(IDX.packs.map(p => pack(p.category))); announce(navigator.serviceWorker && navigator.serviceWorker.controller ? 'All pieces are saved on this phone.' : 'All pieces are loaded for this session.'); } catch (e) { announce('Could not save everything. Check the internet connection.'); }
+    });
+    document.addEventListener('keydown', e => {
+      if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === ' ' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ensureAudio(); toggle(); }
+      else if (e.key === 'n' || e.key === 'N') jumpPiece(1);
+      else if (e.key === 'p' || e.key === 'P') jumpPiece(-1);
+      else if (e.key === 'a' || e.key === 'A') sayAgain();
+      else if (e.key === 'ArrowRight' && e.target.tagName !== 'BUTTON') jumpPara(1);
+      else if (e.key === 'ArrowLeft' && e.target.tagName !== 'BUTTON') jumpPara(-1);
+    });
+    if (synth()) { synth().onvoiceschanged = refreshVoices; }
+    mediaHandlers();
+  }
+  async function init() {
+    bind();
+    renderText('help', HELP); renderText('teach', TEACH);
+    try {
+      const r = await fetch('packs/index.json'); if (!r.ok) throw new Error(r.status);
+      IDX = await r.json();
+    } catch (e) { setNow('Could not load the library. Check the internet connection and reload the page.'); announce('Could not load the library.'); return; }
+    IDX.articles.forEach(a => { BY[a.id] = a; });
+    CATS = IDX.categories; LEVELS = IDX.levels;
+    renderSleep(); renderBuild(); renderShelves(); renderBrowse(); renderCredits(); renderSettings(); renderSounds(); updateUI();
+    const tot = IDX.articles.reduce((n, a) => n + a.m, 0);
+    const base = `Maths by Ear version ${VERSION}. ${IDX.articles.length} pieces, about ${Math.round(tot / 60)} hours.`;
+    if (!$('b-resume').hidden) setNow(`${base} Welcome back, my dear friend. Press Resume, or Play, and we carry on where we stopped.`);
+    else setNow(`${base} Press Play once, and Professor Pennyfeather will lecture from counting to calculus for as long as you care to listen.`);
+    document.body.dataset.ready = '1';
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  init();
+})();
+</script>
+</body>
+</html>
